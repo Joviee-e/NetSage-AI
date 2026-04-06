@@ -538,3 +538,12 @@ Sample CLI output:
 2026-04-06 23:10:13 | [ALERT] Anomaly detected | 10.0.0.9 -> 10.0.0.3
 2026-04-06 23:10:14 | [ALERT] DDOS detected (confidence: 0.91) | 10.0.0.7 -> 10.0.0.2
 ```
+
+## Colored CLI Alerts
+
+Realtime CLI alerts now use ANSI colors for better visibility during live capture.
+
+- Anomaly and attack alerts are shown in red (`[ALERT]`) so they stand out immediately.
+- Normal packet processing logs can appear in green (`[INFO]`) for quick scanning.
+- On Windows, ANSI support is initialized via `colorama` in realtime mode.
+

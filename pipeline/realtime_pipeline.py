@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Dict, List
 
+import colorama
 import pandas as pd
 
 from capture.tshark_runner import stream_packets
@@ -17,6 +18,12 @@ from visualization.report_generator import generate_report
 logger = setup_logger("pipeline.realtime")
 
 BUFFER_SIZE = 1
+RED = "\033[91m"
+GREEN = "\033[92m"
+YELLOW = "\033[93m"
+RESET = "\033[0m"
+
+colorama.init()
 
 
 def _format_ts() -> str:
@@ -49,28 +56,18 @@ def _emit_live_logs(result_df: pd.DataFrame) -> None:
             attack = str(row.get("attack_type", "anomaly"))
             conf = float(row.get("attack_confidence", 0.0))
             if attack and attack.lower() != "normal":
+                attack_type = attack.upper()
+                confidence = conf
                 logger.warning(
-                    "%s | [ALERT] %s detected (confidence: %.2f) | %s -> %s",
-                    stamp,
-                    attack.upper(),
-                    conf,
-                    src_ip,
-                    dst_ip,
+                    f"{stamp} | {RED}\U0001F6A8 [ALERT] {attack_type} detected (confidence: {confidence:.2f}){RESET} | {src_ip} -> {dst_ip}"
                 )
             else:
                 logger.warning(
-                    "%s | [ALERT] Anomaly detected | %s -> %s",
-                    stamp,
-                    src_ip,
-                    dst_ip,
+                    f"{stamp} | {RED}\U0001F6A8 [ALERT] Anomaly detected{RESET} | {src_ip} -> {dst_ip}"
                 )
         else:
-            logger.info(
-                "%s | [INFO] Packet processed: %s -> %s",
-                stamp,
-                src_ip,
-                dst_ip,
-            )
+            # Keep realtime CLI focused on alerts; progress is logged periodically.
+            pass
 
 
 def run_realtime_pipeline(config) -> pd.DataFrame:
@@ -111,7 +108,13 @@ def run_realtime_pipeline(config) -> pd.DataFrame:
                     _emit_live_logs(batch_df)
                     results.append(batch_df)
                     processed_packets += len(batch_df)
-                    logger.info("Packets processed: %d", processed_packets)
+                    if processed_packets % 50 == 0:
+                        logger.info(
+                            "%s[INFO] Packets processed: %d%s",
+                            GREEN,
+                            processed_packets,
+                            RESET,
+                        )
                 packet_buffer = []
 
     except KeyboardInterrupt:
@@ -128,7 +131,13 @@ def run_realtime_pipeline(config) -> pd.DataFrame:
                 _emit_live_logs(batch_df)
                 results.append(batch_df)
                 processed_packets += len(batch_df)
-                logger.info("Packets processed: %d", processed_packets)
+                if processed_packets % 50 == 0:
+                    logger.info(
+                        "%s[INFO] Packets processed: %d%s",
+                        GREEN,
+                        processed_packets,
+                        RESET,
+                    )
 
     if not results:
         logger.warning(
