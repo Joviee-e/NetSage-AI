@@ -39,6 +39,50 @@ Copy and fill this block for every new entry:
 ## ── JOURNAL ──────────────────────────────────────────────────────
 
 ---
+### [2026-04-06] � Implement classification/attack_classifier.py
+
+**Type:** Feature
+**Module(s) affected:** classification/attack_classifier.py
+**Author:** Codex (GPT-5)
+
+#### Changes Made
+- Implemented `load_classifier(model_path)`:
+  - Validates model path input
+  - Raises `FileNotFoundError` when classifier file is missing
+  - Loads pickle and validates type as `sklearn.ensemble.RandomForestClassifier`
+- Implemented `predict_attack_types(df, model)`:
+  - Validates DataFrame, `is_anomaly` presence, and model interfaces (`predict`, `predict_proba`)
+  - Initializes default labels for all packets:
+    - `attack_type = "normal"`
+    - `attack_confidence = 1.0`
+  - Runs classifier only on `df[df["is_anomaly"] == 1]`
+  - Computes confidence as the probability of the predicted class from `predict_proba()`
+  - Merges anomaly predictions back into the full DataFrame
+  - Safely skips model inference when anomaly set is empty
+- Implemented `get_attack_summary(df)`:
+  - Validates `attack_type` column
+  - Returns label-count dictionary
+- Implemented `classify_attacks(df, model_path)`:
+  - High-level orchestration of model loading + anomaly-only classification
+- Added runnable mock DataFrame test in module `__main__`:
+  - Trains a tiny temporary Random Forest model
+  - Saves/loads model from disk
+  - Demonstrates output columns `attack_type` and `attack_confidence`
+
+#### Features Added
+- Full classification inference stage for anomalous packets only
+- Standardized classification output schema (`attack_type`, `attack_confidence`)
+- Safe no-anomaly behavior that preserves normal labeling without model call
+
+#### Bugs Fixed
+- N/A (initial implementation)
+
+#### Notes / Decisions
+- Assumption: if `model.feature_names_in_` exists, it is treated as the required feature contract; missing feature columns raise a `ValueError`.
+- Assumption: for normal packets (`is_anomaly == 0`), confidence should remain exactly `1.0` as required.
+- Confidence for anomalous packets is defined as the predicted class probability, not max probability across unrelated labels.
+
+---
 ### [2026-04-06] — Implement detection/anomaly_detector.py
 
 **Type:** Feature
@@ -227,6 +271,9 @@ Add new to-do items here. Move to journal when completed.
 
 *Keep this file updated. A good devlog is the difference between a project
 that can be maintained and one that has to be rewritten from scratch.*
+
+
+
 
 
 
