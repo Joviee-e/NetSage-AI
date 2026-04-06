@@ -170,3 +170,13 @@
 2026-04-06 19:44:20,104 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
 2026-04-06 19:44:20,105 | features.extractor   | WARNING  | Requested columns not found in DataFrame: {'nonexistent_col'}
 2026-04-06 19:44:20,106 | features.extractor   | INFO     | Selected 2 columns for model input (0 feature + IP context).
+2026-04-06 21:17:37,252 | visualization.report_generator | INFO     | Saved JSON results: output\reports\results_20260406_211737.json
+2026-04-06 21:18:07,375 | visualization.report_generator | INFO     | Saved JSON results: output\reports\results_20260406_211807.json
+2026-04-06 21:18:07,526 | visualization.report_generator | INFO     | Saved traffic chart: output\reports\traffic_20260406_211807.png
+2026-04-06 21:18:07,572 | visualization.report_generator | INFO     | Saved attack breakdown chart: output\reports\attacks_20260406_211807.png
+2026-04-06 21:18:07,576 | visualization.report_generator | INFO     | Generated report artifacts | html=output\reports\report_20260406_211807.html json=output\reports\results_20260406_211807.json traffic=output\reports\traffic_20260406_211807.png attacks=output\reports\attacks_20260406_211807.png
+2026-04-06 21:23:55,762 | visualization.report_generator | INFO     | JSON output written: output\reports\2026-04-06_21-23-55\results.json
+2026-04-06 21:23:55,862 | visualization.report_generator | INFO     | Traffic chart written: output\reports\2026-04-06_21-23-55\traffic.png
+2026-04-06 21:23:55,909 | visualization.report_generator | INFO     | Attack breakdown chart written: output\reports\2026-04-06_21-23-55\attacks.png
+2026-04-06 21:23:55,913 | visualization.report_generator | INFO     | HTML report written: output\reports\2026-04-06_21-23-55\report.html
+2026-04-06 21:23:55,913 | visualization.report_generator | INFO     | Report generation completed: {'output_dir': 'output\\reports\\2026-04-06_21-23-55', 'report_html': 'output\\reports\\2026-04-06_21-23-55\\report.html', 'results_json': 'output\\reports\\2026-04-06_21-23-55\\results.json', 'traffic_chart': 'output\\reports\\2026-04-06_21-23-55\\traffic.png', 'attack_chart': 'output\\reports\\2026-04-06_21-23-55\\attacks.png'}

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Network Anomaly Detection Report</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; color: #1F2937; }
+    h1, h2 { margin-bottom: 8px; }
+    .cards { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+    .card { border: 1px solid #D1D5DB; border-radius: 8px; padding: 12px 14px; min-width: 180px; background: #F9FAFB; }
+    .charts { display: flex; gap: 16px; flex-wrap: wrap; margin: 16px 0; }
+    .charts img { max-width: 480px; width: 100%; border: 1px solid #E5E7EB; border-radius: 8px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #E5E7EB; padding: 8px; text-align: left; }
+    th { background: #F3F4F6; }
+    .muted { color: #6B7280; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <h1>AI Network Detection Report</h1>
+  <p class="muted">Generated at: 2026-04-06T21:18:07</p>
+
+  <div class="cards">
+    <div class="card"><strong>Total packets</strong><div>4</div></div>
+    <div class="card"><strong>Anomalies</strong><div>2</div></div>
+    <div class="card"><strong>Normal packets</strong><div>2</div></div>
+  </div>
+
+  <h2>Attack Type Counts</h2>
+  <table>
+    <thead><tr><th>Attack Type</th><th>Count</th></tr></thead>
+    <tbody><tr><td>normal</td><td>2</td></tr><tr><td>DoS</td><td>1</td></tr><tr><td>PortScan</td><td>1</td></tr></tbody>
+  </table>
+
+  <h2>Charts</h2>
+  <div class="charts">
+    <div>
+      <h3>Traffic Distribution</h3>
+      <img src="traffic_20260406_211807.png" alt="Traffic distribution chart" />
+    </div>
+    <div>
+      <h3>Attack Breakdown</h3>
+      <img src="attacks_20260406_211807.png" alt="Attack breakdown chart" />
+    </div>
+  </div>
+
+  <h2>Result Preview (First 30 Rows)</h2>
+  <table border="1" class="dataframe result-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>ip.src</th>
+      <th>ip.dst</th>
+      <th>is_anomaly</th>
+      <th>attack_type</th>
+      <th>attack_confidence</th>
+      <th>anomaly_score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>10.0.0.1</td>
+      <td>10.0.0.5</td>
+      <td>0</td>
+      <td>normal</td>
+      <td>1.00</td>
+      <td>0.12</td>
+    </tr>
+    <tr>
+      <td>10.0.0.8</td>
+      <td>10.0.0.7</td>
+      <td>1</td>
+      <td>DoS</td>
+      <td>0.91</td>
+      <td>-0.44</td>
+    </tr>
+    <tr>
+      <td>10.0.0.2</td>
+      <td>10.0.0.4</td>
+      <td>0</td>
+      <td>normal</td>
+      <td>1.00</td>
+      <td>0.07</td>
+    </tr>
+    <tr>
+      <td>10.0.0.9</td>
+      <td>10.0.0.6</td>
+      <td>1</td>
+      <td>PortScan</td>
+      <td>0.86</td>
+      <td>-0.31</td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>
