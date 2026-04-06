@@ -25,7 +25,7 @@ TSHARK_FIELDS: List[str] = [
 class CaptureConfig:
     """Settings for the TShark capture stage."""
 
-    interface: str = "eth0"
+    interface: str = "4"
     duration: int = 60  # seconds
     pcap_file: Optional[str] = None
     tshark_path: str = "tshark"
