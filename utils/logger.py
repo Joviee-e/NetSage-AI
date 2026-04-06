@@ -9,13 +9,11 @@ Usage:
 
 import logging
 import os
-from logging.handlers import RotatingFileHandler
+from logging.handlers import TimedRotatingFileHandler
 
 LOG_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "logs")
 LOG_FILE = os.path.join(LOG_DIR, "app.log")
 
-# Maximum log file size before rotation (5 MB)
-MAX_BYTES = 5 * 1024 * 1024
 BACKUP_COUNT = 3
 
 _FORMAT = "%(asctime)s | %(name)-20s | %(levelname)-8s | %(message)s"
@@ -33,9 +31,10 @@ def setup_logger(name: str, level: str = "INFO") -> logging.Logger:
     """
     logger = logging.getLogger(name)
 
-    # Avoid adding duplicate handlers on repeated calls
-    if logger.handlers:
-        return logger
+    if logger.hasHandlers():
+        for handler in logger.handlers:
+            handler.close()
+        logger.handlers.clear()
 
     logger.setLevel(getattr(logging, level.upper(), logging.INFO))
 
@@ -46,10 +45,15 @@ def setup_logger(name: str, level: str = "INFO") -> logging.Logger:
     console.setFormatter(formatter)
     logger.addHandler(console)
 
-    # Rotating file handler
+    # Timed rotating file handler
     os.makedirs(LOG_DIR, exist_ok=True)
-    file_handler = RotatingFileHandler(
-        LOG_FILE, maxBytes=MAX_BYTES, backupCount=BACKUP_COUNT
+    file_handler = TimedRotatingFileHandler(
+        LOG_FILE,
+        when="midnight",
+        interval=1,
+        backupCount=BACKUP_COUNT,
+        encoding="utf-8",
+        delay=True,
     )
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
