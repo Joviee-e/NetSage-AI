@@ -180,3 +180,89 @@
 2026-04-06 21:23:55,909 | visualization.report_generator | INFO     | Attack breakdown chart written: output\reports\2026-04-06_21-23-55\attacks.png
 2026-04-06 21:23:55,913 | visualization.report_generator | INFO     | HTML report written: output\reports\2026-04-06_21-23-55\report.html
 2026-04-06 21:23:55,913 | visualization.report_generator | INFO     | Report generation completed: {'output_dir': 'output\\reports\\2026-04-06_21-23-55', 'report_html': 'output\\reports\\2026-04-06_21-23-55\\report.html', 'results_json': 'output\\reports\\2026-04-06_21-23-55\\results.json', 'traffic_chart': 'output\\reports\\2026-04-06_21-23-55\\traffic.png', 'attack_chart': 'output\\reports\\2026-04-06_21-23-55\\attacks.png'}
+2026-04-06 21:33:01,956 | pipeline             | INFO     | Pipeline started.
+2026-04-06 21:33:01,956 | pipeline             | INFO     | Step 1/5 — Capturing packets via TShark...
+2026-04-06 21:33:01,957 | capture.tshark_runner | INFO     | Starting capture — mode=live, source=eth0
+2026-04-06 21:33:01,961 | capture.tshark_runner | ERROR    | TShark binary 'tshark' not found. Install Wireshark/TShark and ensure it is on PATH.
+2026-04-06 21:39:40,092 | pipeline             | INFO     | Pipeline started.
+2026-04-06 21:39:40,092 | pipeline             | INFO     | Step 1/5 — Capturing packets via TShark...
+2026-04-06 21:39:40,092 | capture.tshark_runner | INFO     | Starting capture — mode=live, source=eth0
+2026-04-06 21:39:40,096 | capture.tshark_runner | INFO     | Running TShark: tshark -i eth0 -a duration:60 -T fields -e ip.src -e ip.dst -e frame.len -e frame.time_epoch -e tcp.flags -e ip.proto -E separator=	 -E header=n -E quote=n -E occurrence=f
+2026-04-06 21:39:40,989 | capture.tshark_runner | ERROR    | TShark exited with code 1 — stderr: Capturing on 'eth0'
+tshark: The capture session could not be initiated on capture device "eth0".
+(Error opening adapter: The filename, directory name, or volume label syntax is incorrect.  (123))
+Please check that you have the proper interface or pipe specified.
+0 packets captured
+2026-04-06 21:41:06,929 | pipeline             | INFO     | Pipeline started.
+2026-04-06 21:41:06,929 | pipeline             | INFO     | Step 1/5 — Capturing packets via TShark...
+2026-04-06 21:41:06,929 | capture.tshark_runner | INFO     | Starting capture — mode=live, source=eth0
+2026-04-06 21:41:06,934 | capture.tshark_runner | INFO     | Running TShark: tshark -i eth0 -a duration:60 -T fields -e ip.src -e ip.dst -e frame.len -e frame.time_epoch -e tcp.flags -e ip.proto -E separator=	 -E header=n -E quote=n -E occurrence=f
+2026-04-06 21:41:07,624 | capture.tshark_runner | ERROR    | TShark exited with code 1 — stderr: Capturing on 'eth0'
+tshark: The capture session could not be initiated on capture device "eth0".
+(Error opening adapter: The filename, directory name, or volume label syntax is incorrect.  (123))
+Please check that you have the proper interface or pipe specified.
+0 packets captured
+2026-04-06 21:42:18,841 | pipeline             | INFO     | Pipeline started.
+2026-04-06 21:42:18,841 | pipeline             | INFO     | Step 1/5 — Capturing packets via TShark...
+2026-04-06 21:42:18,842 | capture.tshark_runner | INFO     | Starting capture — mode=live, source=4
+2026-04-06 21:42:18,845 | capture.tshark_runner | INFO     | Running TShark: tshark -i 4 -a duration:60 -T fields -e ip.src -e ip.dst -e frame.len -e frame.time_epoch -e tcp.flags -e ip.proto -E separator=	 -E header=n -E quote=n -E occurrence=f
+2026-04-06 21:43:19,452 | capture.tshark_runner | INFO     | TShark finished successfully.
+2026-04-06 21:43:19,453 | capture.tshark_runner | INFO     | Parsed 442 packets from TShark output.
+2026-04-06 21:43:19,454 | pipeline             | INFO     | Step 2/5 — Extracting features...
+2026-04-06 21:43:19,454 | features.extractor   | INFO     | Feature extraction pipeline started — 442 packets.
+2026-04-06 21:43:19,455 | features.extractor   | INFO     | Created DataFrame: 442 rows × 6 columns.
+2026-04-06 21:43:19,461 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
+2026-04-06 21:43:19,464 | features.extractor   | INFO     | Selected 12 columns for model input (10 feature + IP context).
+2026-04-06 21:43:19,464 | features.extractor   | INFO     | Feature extraction complete — output shape: 442 × 12.
+2026-04-06 21:43:19,464 | pipeline             | INFO     | Step 3/5 — Running anomaly detection...
+2026-04-06 21:43:19,464 | detection.anomaly_detector | ERROR    | Anomaly model file not found: models\saved\isolation_forest.pkl
+2026-04-06 21:50:01,895 | models.trainer       | INFO     | Training started.
+2026-04-06 21:50:02,160 | models.trainer       | INFO     | Models saved: models\saved\isolation_forest.pkl, models\saved\random_forest.pkl
+2026-04-06 21:50:02,160 | models.trainer       | INFO     | Training completed.
+2026-04-06 21:52:02,240 | models.trainer       | INFO     | Training started.
+2026-04-06 21:52:02,488 | models.trainer       | INFO     | Models saved: models\saved\isolation_forest.pkl, models\saved\random_forest.pkl
+2026-04-06 21:52:02,488 | models.trainer       | INFO     | Training completed.
+2026-04-06 21:52:25,010 | pipeline             | INFO     | Pipeline started.
+2026-04-06 21:52:25,011 | pipeline             | INFO     | Step 1/5 — Capturing packets via TShark...
+2026-04-06 21:52:25,011 | capture.tshark_runner | INFO     | Starting capture — mode=live, source=4
+2026-04-06 21:52:25,015 | capture.tshark_runner | INFO     | Running TShark: tshark -i 4 -a duration:60 -T fields -e ip.src -e ip.dst -e frame.len -e frame.time_epoch -e tcp.flags -e ip.proto -E separator=	 -E header=n -E quote=n -E occurrence=f
+2026-04-06 21:53:25,643 | capture.tshark_runner | INFO     | TShark finished successfully.
+2026-04-06 21:53:25,644 | capture.tshark_runner | INFO     | Parsed 452 packets from TShark output.
+2026-04-06 21:53:25,644 | pipeline             | INFO     | Step 2/5 — Extracting features...
+2026-04-06 21:53:25,644 | features.extractor   | INFO     | Feature extraction pipeline started — 452 packets.
+2026-04-06 21:53:25,645 | features.extractor   | INFO     | Created DataFrame: 452 rows × 6 columns.
+2026-04-06 21:53:25,655 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
+2026-04-06 21:53:25,657 | features.extractor   | INFO     | Selected 12 columns for model input (10 feature + IP context).
+2026-04-06 21:53:25,657 | features.extractor   | INFO     | Feature extraction complete — output shape: 452 × 12.
+2026-04-06 21:53:25,657 | pipeline             | INFO     | Step 3/5 — Running anomaly detection...
+2026-04-06 21:53:25,690 | detection.anomaly_detector | INFO     | Loaded IsolationForest model from models\saved\isolation_forest.pkl
+2026-04-06 21:53:25,729 | detection.anomaly_detector | INFO     | Scored 452 packets. Anomalies flagged: 169
+2026-04-06 21:53:25,730 | pipeline             | INFO     | Step 4/5 — Classifying attacks...
+2026-04-06 21:53:25,766 | classification.attack_classifier | INFO     | Loaded RandomForestClassifier from models\saved\random_forest.pkl
+2026-04-06 21:53:25,806 | classification.attack_classifier | INFO     | Classified 169 anomalous packets across 452 total rows.
+2026-04-06 21:53:25,807 | pipeline             | INFO     | Step 5/5 — Generating report...
+2026-04-06 21:56:48,060 | pipeline             | INFO     | Pipeline started.
+2026-04-06 21:56:48,061 | pipeline             | INFO     | Step 1/5 — Capturing packets via TShark...
+2026-04-06 21:56:48,061 | capture.tshark_runner | INFO     | Starting capture — mode=live, source=4
+2026-04-06 21:56:48,065 | capture.tshark_runner | INFO     | Running TShark: tshark -i 4 -a duration:60 -T fields -e ip.src -e ip.dst -e frame.len -e frame.time_epoch -e tcp.flags -e ip.proto -E separator=	 -E header=n -E quote=n -E occurrence=f
+2026-04-06 21:57:49,025 | capture.tshark_runner | INFO     | TShark finished successfully.
+2026-04-06 21:57:49,026 | capture.tshark_runner | INFO     | Parsed 397 packets from TShark output.
+2026-04-06 21:57:49,027 | pipeline             | INFO     | Step 2/5 — Extracting features...
+2026-04-06 21:57:49,027 | features.extractor   | INFO     | Feature extraction pipeline started — 397 packets.
+2026-04-06 21:57:49,029 | features.extractor   | INFO     | Created DataFrame: 397 rows × 6 columns.
+2026-04-06 21:57:49,064 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
+2026-04-06 21:57:49,068 | features.extractor   | INFO     | Selected 12 columns for model input (10 feature + IP context).
+2026-04-06 21:57:49,069 | features.extractor   | INFO     | Feature extraction complete — output shape: 397 × 12.
+2026-04-06 21:57:49,069 | pipeline             | INFO     | Step 3/5 — Running anomaly detection...
+2026-04-06 21:57:49,079 | detection.anomaly_detector | INFO     | Loaded IsolationForest model from models\saved\isolation_forest.pkl
+2026-04-06 21:57:49,120 | detection.anomaly_detector | INFO     | Scored 397 packets. Anomalies flagged: 38
+2026-04-06 21:57:49,121 | pipeline             | INFO     | Step 4/5 — Classifying attacks...
+2026-04-06 21:57:49,131 | classification.attack_classifier | INFO     | Loaded RandomForestClassifier from models\saved\random_forest.pkl
+2026-04-06 21:57:49,184 | classification.attack_classifier | INFO     | Classified 38 anomalous packets across 397 total rows.
+2026-04-06 21:57:49,185 | pipeline             | INFO     | Step 5/5 — Generating report...
+2026-04-06 21:57:49,212 | visualization.report_generator | INFO     | JSON output written: output\reports\2026-04-06_21-57-49\results.json
+2026-04-06 21:57:49,448 | visualization.report_generator | INFO     | Traffic chart written: output\reports\2026-04-06_21-57-49\traffic.png
+2026-04-06 21:57:49,571 | visualization.report_generator | INFO     | Attack breakdown chart written: output\reports\2026-04-06_21-57-49\attacks.png
+2026-04-06 21:57:49,586 | visualization.report_generator | INFO     | HTML report written: output\reports\2026-04-06_21-57-49\report.html
+2026-04-06 21:57:49,587 | visualization.report_generator | INFO     | Report generation completed: {'output_dir': 'output\\reports\\2026-04-06_21-57-49', 'report_html': 'output\\reports\\2026-04-06_21-57-49\\report.html', 'results_json': 'output\\reports\\2026-04-06_21-57-49\\results.json', 'traffic_chart': 'output\\reports\\2026-04-06_21-57-49\\traffic.png', 'attack_chart': 'output\\reports\\2026-04-06_21-57-49\\attacks.png'}
+2026-04-06 21:57:49,587 | pipeline             | INFO     | Pipeline complete.

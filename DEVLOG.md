@@ -39,6 +39,44 @@ Copy and fill this block for every new entry:
 ## ── JOURNAL ──────────────────────────────────────────────────────
 
 ---
+### [2026-04-06] - Implement models/trainer.py (synthetic training pipeline)
+
+**Type:** Feature
+**Module(s) affected:** models/trainer.py
+**Author:** Codex (GPT-5)
+
+#### Changes Made
+- Created `models/trainer.py` with a clean training flow for two models:
+  - Isolation Forest (anomaly detection)
+  - Random Forest Classifier (attack classification)
+- Implemented synthetic data generation (~1000 rows default) with required feature set:
+  - `frame_len`, `ip_proto`, `is_tcp`, `is_udp`, `tcp_flag_syn`, `tcp_flag_ack`, `tcp_flag_fin`, `tcp_flag_rst`, `tcp_flag_psh`, `hour_of_day`
+- Added synthetic labels in `attack_type`:
+  - `normal`, `port_scan`, `ddos`
+- Implemented model training helpers:
+  - `train_isolation_forest(df)`
+  - `train_random_forest(df)`
+- Implemented model persistence via pickle:
+  - `models/saved/isolation_forest.pkl`
+  - `models/saved/random_forest.pkl`
+- Added logging for:
+  - training started
+  - models saved
+  - training completed
+- Added `run_training()` orchestrator and `__main__` execution block.
+
+#### Features Added
+- Fully self-contained synthetic training workflow (no external dataset required).
+- Pipeline-compatible saved model artifacts in configured `models/saved/` directory.
+
+#### Bugs Fixed
+- N/A (initial implementation)
+
+#### Notes / Decisions
+- Assumption: synthetic distributions are intentionally simple and only meant to bootstrap pipeline integration.
+- Assumption: no scaler artifact is required for current detector/classifier inference modules.
+
+---
 ### [2026-04-06] - Refactor visualization/report_generator.py for production reporting
 
 **Type:** Refactor
@@ -353,6 +391,10 @@ Add new to-do items here. Move to journal when completed.
 
 *Keep this file updated. A good devlog is the difference between a project
 that can be maintained and one that has to be rewritten from scratch.*
+
+
+
+
 
 
 

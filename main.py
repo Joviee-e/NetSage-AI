@@ -55,7 +55,7 @@ def run_pipeline(config):
     logger.info("Step 5/5 — Generating report...")
     generate_report(
         result_df,
-        output_dir=config.output.report_dir,
+        base_output_dir=config.output.report_dir,
     )
 
     logger.info("Pipeline complete.")
