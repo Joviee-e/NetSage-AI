@@ -39,6 +39,88 @@ Copy and fill this block for every new entry:
 ## ── JOURNAL ──────────────────────────────────────────────────────
 
 ---
+### [2026-04-06] - Refactor visualization/report_generator.py for production reporting
+
+**Type:** Refactor
+**Module(s) affected:** visualization/report_generator.py
+**Author:** Codex (GPT-5)
+
+#### Changes Made
+- Rebuilt the module to remove duplicated HTML-generation logic and centralize data preparation.
+- Enforced required input columns (`is_anomaly`, `attack_type`) with shared validation helpers.
+- Added robust anomaly-flag normalization for bool/numeric/text-like inputs.
+- Implemented JSON output schema exactly as:
+  - `metadata` (timestamp, total_packets, anomalies)
+  - `summary` (normal, anomaly)
+  - `attack_distribution`
+  - `data`
+- Updated chart functions to use cleaned data consistently and added stronger labeling/styling.
+- Updated HTML generation to produce a single `report.html` with:
+  - timestamp
+  - summary cards
+  - anomaly count highlighted in red
+  - attack breakdown table
+  - embedded `traffic.png` and `attacks.png`
+  - first 10 rows preview
+- Updated `generate_report(df, base_output_dir)` to create timestamped run directory:
+  - `base_output_dir/YYYY-MM-DD_HH-MM-SS/`
+  - outputs fixed names: `report.html`, `results.json`, `traffic.png`, `attacks.png`
+- Kept logging throughout the module and retained `__main__` mock-run block.
+
+#### Features Added
+- Timestamped run-folder output organization for cleaner artifact management.
+- Deterministic output filenames within each run folder.
+- Production-safe matplotlib `Agg` backend initialization for headless execution.
+
+#### Bugs Fixed
+- Removed prior path/filename inconsistency between individual generators and orchestrator.
+- Removed duplicate HTML template generation paths that could diverge over time.
+
+#### Notes / Decisions
+- Assumption: `is_anomaly` may arrive as bool, numeric, or text-like values; normalization treats non-zero/true-like values as anomalies.
+- Assumption: missing `attack_type` values are normalized to `"unknown"` across JSON/charts/report table.
+---
+### [2026-04-06] - Implement visualization/report_generator.py
+
+**Type:** Feature
+**Module(s) affected:** visualization/report_generator.py
+**Author:** Codex (GPT-5)
+
+#### Changes Made
+- Implemented `results_to_json(df, output_path)`:
+  - Validates DataFrame input
+  - Writes structured JSON containing metadata, counts, and row-wise results
+- Implemented `generate_traffic_chart(df, output_path)`:
+  - Validates required `is_anomaly` column
+  - Generates normal vs anomaly bar chart using matplotlib
+- Implemented `generate_attack_breakdown_chart(df, output_path)`:
+  - Validates required `attack_type` column
+  - Generates attack-type pie chart using matplotlib
+- Implemented `generate_html_report(df, output_dir)`:
+  - Builds timestamped HTML report with summary statistics, chart references, and a preview table
+- Implemented `generate_report(df, output_dir)`:
+  - High-level orchestration that writes all artifacts with a shared timestamp:
+    - `report_TIMESTAMP.html`
+    - `results_TIMESTAMP.json`
+    - `traffic_TIMESTAMP.png`
+    - `attacks_TIMESTAMP.png`
+- Added runnable mock DataFrame example in module `__main__` to generate and print produced file paths
+
+#### Features Added
+- Structured JSON export for full pipeline output
+- Visualization layer with traffic and attack charts
+- HTML reporting with packet totals, anomaly count, and attack-type count table
+- Headless-safe matplotlib rendering via `Agg` backend
+
+#### Bugs Fixed
+- N/A (initial implementation)
+
+#### Notes / Decisions
+- Assumption: report generation requires at minimum `is_anomaly` and `attack_type` columns for complete output.
+- Assumption: `attack_type` may contain missing values; these are treated as `"unknown"` in summaries/charts.
+- JSON serialization uses `default=str` so non-JSON-native values (if present) are still persisted safely.
+
+---
 ### [2026-04-06] � Implement classification/attack_classifier.py
 
 **Type:** Feature
@@ -271,6 +353,12 @@ Add new to-do items here. Move to journal when completed.
 
 *Keep this file updated. A good devlog is the difference between a project
 that can be maintained and one that has to be rewritten from scratch.*
+
+
+
+
+
+
 
 
 

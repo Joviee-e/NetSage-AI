@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "timestamp": "2026-04-06T21:23:55",
+    "total_packets": 5,
+    "anomalies": 2
+  },
+  "summary": {
+    "normal": 3,
+    "anomaly": 2
+  },
+  "attack_distribution": {
+    "normal": 2,
+    "DoS": 1,
+    "unknown": 1,
+    "PortScan": 1
+  },
+  "data": [
+    {
+      "ip.src": "10.0.0.1",
+      "ip.dst": "10.0.1.1",
+      "is_anomaly": 0,
+      "attack_type": "normal",
+      "attack_confidence": 1.0,
+      "anomaly_score": 0.12
+    },
+    {
+      "ip.src": "10.0.0.2",
+      "ip.dst": "10.0.1.2",
+      "is_anomaly": 1,
+      "attack_type": "DoS",
+      "attack_confidence": 0.94,
+      "anomaly_score": -0.33
+    },
+    {
+      "ip.src": "10.0.0.3",
+      "ip.dst": "10.0.1.3",
+      "is_anomaly": 0,
+      "attack_type": "unknown",
+      "attack_confidence": 1.0,
+      "anomaly_score": 0.09
+    },
+    {
+      "ip.src": "10.0.0.4",
+      "ip.dst": "10.0.1.4",
+      "is_anomaly": 1,
+      "attack_type": "PortScan",
+      "attack_confidence": 0.88,
+      "anomaly_score": -0.41
+    },
+    {
+      "ip.src": "10.0.0.5",
+      "ip.dst": "10.0.1.5",
+      "is_anomaly": 0,
+      "attack_type": "normal",
+      "attack_confidence": 1.0,
+      "anomaly_score": 0.11
+    }
+  ]
+}
