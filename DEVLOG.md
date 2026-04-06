@@ -39,6 +39,50 @@ Copy and fill this block for every new entry:
 ## ── JOURNAL ──────────────────────────────────────────────────────
 
 ---
+### [2026-04-06] — Implement detection/anomaly_detector.py
+
+**Type:** Feature
+**Module(s) affected:** detection/anomaly_detector.py
+**Author:** Codex (GPT-5)
+
+#### Changes Made
+- Implemented `load_anomaly_model(model_path)`:
+  - Validates path input
+  - Raises `FileNotFoundError` for missing model file
+  - Loads model from pickle
+  - Validates loaded object type is `sklearn.ensemble.IsolationForest`
+- Implemented `score_packets(df, model)`:
+  - Validates DataFrame input and empty input handling
+  - Validates model exposes `predict()` and `decision_function()`
+  - Scores packets using numeric columns only
+  - Adds:
+    - `is_anomaly` (mapped from `predict`: `-1 -> 1`, `1 -> 0`)
+    - `anomaly_score` (from `decision_function()`, float)
+- Implemented `filter_anomalies(df)`:
+  - Validates DataFrame and required `is_anomaly` column
+  - Returns only flagged anomaly rows (`is_anomaly == 1`)
+- Implemented `detect_anomalies(df, model_path)`:
+  - High-level orchestration of model loading + packet scoring
+- Added a small runnable mock DataFrame test block in module `__main__`:
+  - Trains a tiny temporary Isolation Forest
+  - Saves/loads model from disk
+  - Runs `detect_anomalies()`
+  - Logs example output table
+
+#### Features Added
+- Full anomaly inference pipeline for detection stage
+- Standardized anomaly output schema (`is_anomaly`, `anomaly_score`)
+- Defensive error handling for missing model, invalid DataFrame, and empty input
+
+#### Bugs Fixed
+- N/A (initial implementation)
+
+#### Notes / Decisions
+- Assumption: input DataFrame may include non-numeric context columns (e.g., IP strings), so only numeric/bool columns are used for model scoring.
+- Assumption: persisted anomaly model file contains a raw `IsolationForest` object (not a wrapper dict or tuple).
+- `decision_function()` values are stored as-is, where lower values indicate more anomalous samples.
+
+---
 ### [2026-04-06] — Implement features/extractor.py
 
 **Type:** Feature
@@ -183,3 +227,7 @@ Add new to-do items here. Move to journal when completed.
 
 *Keep this file updated. A good devlog is the difference between a project
 that can be maintained and one that has to be rewritten from scratch.*
+
+
+
+
