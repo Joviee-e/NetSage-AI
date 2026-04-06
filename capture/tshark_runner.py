@@ -26,6 +26,7 @@ logger = setup_logger("capture.tshark_runner")
 
 # ── Constants ────────────────────────────────────────────────────────────────
 FIELD_SEPARATOR = "\t"
+DEFAULT_REALTIME_FILTER = "ip and (tcp port 80 or tcp port 443)"
 
 
 # ── Public API ───────────────────────────────────────────────────────────────
@@ -36,6 +37,7 @@ def build_tshark_command(
     duration: Optional[int] = None,
     pcap_file: Optional[str] = None,
     fields: Optional[List[str]] = None,
+    capture_filter: Optional[str] = None,
     tshark_path: str = "tshark",
 ) -> List[str]:
     """Construct the TShark command-line argument list.
@@ -45,6 +47,7 @@ def build_tshark_command(
         duration:    Capture duration in seconds (live mode only).
         pcap_file:   Path to a .pcap file for offline replay.
         fields:      Protocol fields to extract (default: TSHARK_FIELDS).
+        capture_filter: Optional BPF capture filter expression for live capture.
         tshark_path: Absolute or relative path to the tshark binary.
 
     Returns:
@@ -69,6 +72,8 @@ def build_tshark_command(
         cmd += ["-r", pcap_file]
     else:
         cmd += ["-i", interface]
+        if capture_filter:
+            cmd += ["-f", capture_filter]
         if duration and duration > 0:
             cmd += ["-a", f"duration:{duration}"]
 
@@ -219,6 +224,7 @@ def _parse_tshark_line(line: str, fields: List[str], line_no: int) -> Optional[D
 def stream_packets(
     interface: str,
     fields: Optional[List[str]] = None,
+    capture_filter: Optional[str] = None,
     tshark_path: str = "tshark",
 ) -> Generator[Dict[str, str], None, None]:
     """Stream packets from TShark line-by-line using subprocess.Popen.
@@ -226,6 +232,8 @@ def stream_packets(
     Args:
         interface: Network interface name for live capture.
         fields: Optional field list to extract.
+        capture_filter: Optional BPF filter. If omitted, tries config.capture.filter
+                        and then falls back to DEFAULT_REALTIME_FILTER.
         tshark_path: Path to the tshark binary.
 
     Yields:
@@ -239,11 +247,24 @@ def stream_packets(
         raise ValueError("interface is required for stream_packets().")
 
     fields = fields or list(TSHARK_FIELDS)
+    filter_expr = capture_filter
+    if filter_expr is None:
+        try:
+            from config.settings import load_config
+
+            cfg = load_config()
+            filter_expr = getattr(cfg.capture, "filter", None)
+        except Exception:
+            filter_expr = None
+    if filter_expr is None:
+        filter_expr = DEFAULT_REALTIME_FILTER
+
     cmd = build_tshark_command(
         interface=interface,
         duration=None,
         pcap_file=None,
         fields=fields,
+        capture_filter=filter_expr,
         tshark_path=tshark_path,
     )
 
