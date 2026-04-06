@@ -1,0 +1,172 @@
+2026-04-06 19:39:57,384 | capture.tshark_runner | INFO     | Parsed 3 packets from TShark output.
+2026-04-06 19:39:57,388 | capture.tshark_runner | WARNING  | TShark produced no output — 0 packets captured.
+2026-04-06 19:39:57,392 | capture.tshark_runner | WARNING  | Skipping malformed line 1: expected 6 fields, got 2.
+2026-04-06 19:39:57,392 | capture.tshark_runner | INFO     | Parsed 0 packets from TShark output.
+2026-04-06 19:39:57,396 | capture.tshark_runner | INFO     | Parsed 3 packets from TShark output.
+2026-04-06 19:39:57,399 | capture.tshark_runner | INFO     | Parsed 3 packets from TShark output.
+2026-04-06 19:39:57,402 | capture.tshark_runner | INFO     | Parsed 3 packets from TShark output.
+2026-04-06 19:39:57,405 | capture.tshark_runner | WARNING  | TShark produced no output — 0 packets captured.
+2026-04-06 19:39:57,411 | capture.tshark_runner | ERROR    | TShark binary 'tshark' not found. Install Wireshark/TShark and ensure it is on PATH.
+2026-04-06 19:39:57,416 | capture.tshark_runner | INFO     | Running TShark: tshark -i eth0
+2026-04-06 19:39:57,416 | capture.tshark_runner | ERROR    | TShark exited with code 2 — stderr: permission denied
+2026-04-06 19:39:57,420 | capture.tshark_runner | INFO     | Running TShark: tshark -r test.pcap
+2026-04-06 19:39:57,420 | capture.tshark_runner | INFO     | TShark finished successfully.
+2026-04-06 19:39:57,424 | capture.tshark_runner | INFO     | Starting capture — mode=live, source=eth0
+2026-04-06 19:39:57,425 | capture.tshark_runner | INFO     | Running TShark: tshark -i eth0 -a duration:5 -T fields -e ip.src -e ip.dst -e frame.len -e frame.time_epoch -e tcp.flags -e ip.proto -E separator=	 -E header=n -E quote=n -E occurrence=f
+2026-04-06 19:39:57,425 | capture.tshark_runner | INFO     | TShark finished successfully.
+2026-04-06 19:39:57,425 | capture.tshark_runner | WARNING  | TShark produced no output — 0 packets captured.
+2026-04-06 19:39:57,425 | capture.tshark_runner | WARNING  | Capture finished but no packets were returned.
+2026-04-06 19:39:57,430 | capture.tshark_runner | INFO     | Starting capture — mode=pcap, source=data/sample.pcap
+2026-04-06 19:39:57,430 | capture.tshark_runner | INFO     | Running TShark: tshark -r data/sample.pcap -T fields -e ip.src -e ip.dst -e frame.len -e frame.time_epoch -e tcp.flags -e ip.proto -E separator=	 -E header=n -E quote=n -E occurrence=f
+2026-04-06 19:39:57,431 | capture.tshark_runner | INFO     | TShark finished successfully.
+2026-04-06 19:39:57,431 | capture.tshark_runner | INFO     | Parsed 2 packets from TShark output.
+2026-04-06 19:40:13,152 | capture.tshark_runner | INFO     | Parsed 3 packets from TShark output.
+2026-04-06 19:40:13,160 | capture.tshark_runner | WARNING  | TShark produced no output — 0 packets captured.
+2026-04-06 19:40:13,163 | capture.tshark_runner | WARNING  | Skipping malformed line 1: expected 6 fields, got 2.
+2026-04-06 19:40:13,164 | capture.tshark_runner | INFO     | Parsed 0 packets from TShark output.
+2026-04-06 19:40:13,168 | capture.tshark_runner | INFO     | Parsed 3 packets from TShark output.
+2026-04-06 19:40:13,172 | capture.tshark_runner | INFO     | Parsed 3 packets from TShark output.
+2026-04-06 19:40:13,176 | capture.tshark_runner | INFO     | Parsed 3 packets from TShark output.
+2026-04-06 19:40:13,180 | capture.tshark_runner | WARNING  | TShark produced no output — 0 packets captured.
+2026-04-06 19:40:13,186 | capture.tshark_runner | ERROR    | TShark binary 'tshark' not found. Install Wireshark/TShark and ensure it is on PATH.
+2026-04-06 19:40:13,192 | capture.tshark_runner | INFO     | Running TShark: tshark -i eth0
+2026-04-06 19:40:13,192 | capture.tshark_runner | ERROR    | TShark exited with code 2 — stderr: permission denied
+2026-04-06 19:40:13,197 | capture.tshark_runner | INFO     | Running TShark: tshark -r test.pcap
+2026-04-06 19:40:13,198 | capture.tshark_runner | INFO     | TShark finished successfully.
+2026-04-06 19:40:13,203 | capture.tshark_runner | INFO     | Starting capture — mode=live, source=eth0
+2026-04-06 19:40:13,204 | capture.tshark_runner | INFO     | Running TShark: tshark -i eth0 -a duration:5 -T fields -e ip.src -e ip.dst -e frame.len -e frame.time_epoch -e tcp.flags -e ip.proto -E separator=	 -E header=n -E quote=n -E occurrence=f
+2026-04-06 19:40:13,204 | capture.tshark_runner | INFO     | TShark finished successfully.
+2026-04-06 19:40:13,205 | capture.tshark_runner | WARNING  | TShark produced no output — 0 packets captured.
+2026-04-06 19:40:13,205 | capture.tshark_runner | WARNING  | Capture finished but no packets were returned.
+2026-04-06 19:40:13,213 | capture.tshark_runner | INFO     | Starting capture — mode=pcap, source=data/sample.pcap
+2026-04-06 19:40:13,213 | capture.tshark_runner | INFO     | Running TShark: tshark -r data/sample.pcap -T fields -e ip.src -e ip.dst -e frame.len -e frame.time_epoch -e tcp.flags -e ip.proto -E separator=	 -E header=n -E quote=n -E occurrence=f
+2026-04-06 19:40:13,213 | capture.tshark_runner | INFO     | TShark finished successfully.
+2026-04-06 19:40:13,214 | capture.tshark_runner | INFO     | Parsed 2 packets from TShark output.
+2026-04-06 19:40:28,408 | capture.tshark_runner | INFO     | Parsed 3 packets from TShark output.
+2026-04-06 19:40:28,410 | capture.tshark_runner | WARNING  | TShark produced no output — 0 packets captured.
+2026-04-06 19:40:28,412 | capture.tshark_runner | WARNING  | Skipping malformed line 1: expected 6 fields, got 2.
+2026-04-06 19:40:28,412 | capture.tshark_runner | INFO     | Parsed 0 packets from TShark output.
+2026-04-06 19:40:28,417 | capture.tshark_runner | INFO     | Parsed 3 packets from TShark output.
+2026-04-06 19:40:28,418 | capture.tshark_runner | INFO     | Parsed 3 packets from TShark output.
+2026-04-06 19:40:28,420 | capture.tshark_runner | INFO     | Parsed 3 packets from TShark output.
+2026-04-06 19:40:28,421 | capture.tshark_runner | WARNING  | TShark produced no output — 0 packets captured.
+2026-04-06 19:40:28,426 | capture.tshark_runner | ERROR    | TShark binary 'tshark' not found. Install Wireshark/TShark and ensure it is on PATH.
+2026-04-06 19:40:28,428 | capture.tshark_runner | INFO     | Running TShark: tshark -i eth0
+2026-04-06 19:40:28,429 | capture.tshark_runner | ERROR    | TShark exited with code 2 — stderr: permission denied
+2026-04-06 19:40:28,433 | capture.tshark_runner | INFO     | Running TShark: tshark -r test.pcap
+2026-04-06 19:40:28,434 | capture.tshark_runner | INFO     | TShark finished successfully.
+2026-04-06 19:40:28,437 | capture.tshark_runner | INFO     | Starting capture — mode=live, source=eth0
+2026-04-06 19:40:28,437 | capture.tshark_runner | INFO     | Running TShark: tshark -i eth0 -a duration:5 -T fields -e ip.src -e ip.dst -e frame.len -e frame.time_epoch -e tcp.flags -e ip.proto -E separator=	 -E header=n -E quote=n -E occurrence=f
+2026-04-06 19:40:28,459 | capture.tshark_runner | INFO     | TShark finished successfully.
+2026-04-06 19:40:28,466 | capture.tshark_runner | WARNING  | TShark produced no output — 0 packets captured.
+2026-04-06 19:40:28,468 | capture.tshark_runner | WARNING  | Capture finished but no packets were returned.
+2026-04-06 19:40:28,470 | capture.tshark_runner | INFO     | Starting capture — mode=pcap, source=data/sample.pcap
+2026-04-06 19:40:28,471 | capture.tshark_runner | INFO     | Running TShark: tshark -r data/sample.pcap -T fields -e ip.src -e ip.dst -e frame.len -e frame.time_epoch -e tcp.flags -e ip.proto -E separator=	 -E header=n -E quote=n -E occurrence=f
+2026-04-06 19:40:28,471 | capture.tshark_runner | INFO     | TShark finished successfully.
+2026-04-06 19:40:28,474 | capture.tshark_runner | INFO     | Parsed 2 packets from TShark output.
+2026-04-06 19:44:08,212 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:08,225 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:08,229 | features.extractor   | INFO     | Created DataFrame: 1 rows × 6 columns.
+2026-04-06 19:44:08,232 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:08,255 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
+2026-04-06 19:44:08,260 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:08,269 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
+2026-04-06 19:44:08,272 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:08,283 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
+2026-04-06 19:44:08,285 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:08,293 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
+2026-04-06 19:44:08,296 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:08,305 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
+2026-04-06 19:44:08,308 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:08,315 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
+2026-04-06 19:44:08,319 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:08,327 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
+2026-04-06 19:44:08,329 | features.extractor   | INFO     | Feature extraction pipeline started — 0 packets.
+2026-04-06 19:44:08,330 | features.extractor   | ERROR    | Received empty packet list — cannot build DataFrame.
+2026-04-06 19:44:08,333 | features.extractor   | INFO     | Feature extraction pipeline started — 3 packets.
+2026-04-06 19:44:08,335 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:08,344 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
+2026-04-06 19:44:08,350 | features.extractor   | INFO     | Selected 12 columns for model input (10 feature + IP context).
+2026-04-06 19:44:08,351 | features.extractor   | INFO     | Feature extraction complete — output shape: 3 × 12.
+2026-04-06 19:44:08,353 | features.extractor   | INFO     | Feature extraction pipeline started — 3 packets.
+2026-04-06 19:44:08,354 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:08,362 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
+2026-04-06 19:44:08,365 | features.extractor   | INFO     | Selected 12 columns for model input (10 feature + IP context).
+2026-04-06 19:44:08,366 | features.extractor   | INFO     | Feature extraction complete — output shape: 3 × 12.
+2026-04-06 19:44:08,373 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:08,377 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:08,378 | features.extractor   | ERROR    | Received empty packet list — cannot build DataFrame.
+2026-04-06 19:44:08,380 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:08,389 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
+2026-04-06 19:44:08,391 | features.extractor   | INFO     | Selected 4 columns for model input (2 feature + IP context).
+2026-04-06 19:44:08,393 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:08,401 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
+2026-04-06 19:44:08,404 | features.extractor   | INFO     | Selected 12 columns for model input (10 feature + IP context).
+2026-04-06 19:44:08,405 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:08,412 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
+2026-04-06 19:44:08,413 | features.extractor   | WARNING  | Requested columns not found in DataFrame: {'nonexistent_col'}
+2026-04-06 19:44:08,414 | features.extractor   | INFO     | Selected 2 columns for model input (0 feature + IP context).
+2026-04-06 19:44:19,866 | capture.tshark_runner | INFO     | Parsed 3 packets from TShark output.
+2026-04-06 19:44:19,869 | capture.tshark_runner | WARNING  | TShark produced no output — 0 packets captured.
+2026-04-06 19:44:19,874 | capture.tshark_runner | WARNING  | Skipping malformed line 1: expected 6 fields, got 2.
+2026-04-06 19:44:19,876 | capture.tshark_runner | INFO     | Parsed 0 packets from TShark output.
+2026-04-06 19:44:19,883 | capture.tshark_runner | INFO     | Parsed 3 packets from TShark output.
+2026-04-06 19:44:19,885 | capture.tshark_runner | INFO     | Parsed 3 packets from TShark output.
+2026-04-06 19:44:19,886 | capture.tshark_runner | INFO     | Parsed 3 packets from TShark output.
+2026-04-06 19:44:19,887 | capture.tshark_runner | WARNING  | TShark produced no output — 0 packets captured.
+2026-04-06 19:44:19,895 | capture.tshark_runner | ERROR    | TShark binary 'tshark' not found. Install Wireshark/TShark and ensure it is on PATH.
+2026-04-06 19:44:19,902 | capture.tshark_runner | INFO     | Running TShark: tshark -i eth0
+2026-04-06 19:44:19,903 | capture.tshark_runner | ERROR    | TShark exited with code 2 — stderr: permission denied
+2026-04-06 19:44:19,905 | capture.tshark_runner | INFO     | Running TShark: tshark -r test.pcap
+2026-04-06 19:44:19,906 | capture.tshark_runner | INFO     | TShark finished successfully.
+2026-04-06 19:44:19,910 | capture.tshark_runner | INFO     | Starting capture — mode=live, source=eth0
+2026-04-06 19:44:19,911 | capture.tshark_runner | INFO     | Running TShark: tshark -i eth0 -a duration:5 -T fields -e ip.src -e ip.dst -e frame.len -e frame.time_epoch -e tcp.flags -e ip.proto -E separator=	 -E header=n -E quote=n -E occurrence=f
+2026-04-06 19:44:19,911 | capture.tshark_runner | INFO     | TShark finished successfully.
+2026-04-06 19:44:19,911 | capture.tshark_runner | WARNING  | TShark produced no output — 0 packets captured.
+2026-04-06 19:44:19,912 | capture.tshark_runner | WARNING  | Capture finished but no packets were returned.
+2026-04-06 19:44:19,917 | capture.tshark_runner | INFO     | Starting capture — mode=pcap, source=data/sample.pcap
+2026-04-06 19:44:19,920 | capture.tshark_runner | INFO     | Running TShark: tshark -r data/sample.pcap -T fields -e ip.src -e ip.dst -e frame.len -e frame.time_epoch -e tcp.flags -e ip.proto -E separator=	 -E header=n -E quote=n -E occurrence=f
+2026-04-06 19:44:19,920 | capture.tshark_runner | INFO     | TShark finished successfully.
+2026-04-06 19:44:19,921 | capture.tshark_runner | INFO     | Parsed 2 packets from TShark output.
+2026-04-06 19:44:19,923 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:19,933 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:19,937 | features.extractor   | INFO     | Created DataFrame: 1 rows × 6 columns.
+2026-04-06 19:44:19,944 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:19,953 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
+2026-04-06 19:44:19,955 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:19,966 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
+2026-04-06 19:44:19,968 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:19,978 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
+2026-04-06 19:44:19,988 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:19,999 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
+2026-04-06 19:44:20,002 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:20,011 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
+2026-04-06 19:44:20,013 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:20,024 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
+2026-04-06 19:44:20,026 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:20,033 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
+2026-04-06 19:44:20,036 | features.extractor   | INFO     | Feature extraction pipeline started — 0 packets.
+2026-04-06 19:44:20,036 | features.extractor   | ERROR    | Received empty packet list — cannot build DataFrame.
+2026-04-06 19:44:20,037 | features.extractor   | INFO     | Feature extraction pipeline started — 3 packets.
+2026-04-06 19:44:20,038 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:20,045 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
+2026-04-06 19:44:20,047 | features.extractor   | INFO     | Selected 12 columns for model input (10 feature + IP context).
+2026-04-06 19:44:20,048 | features.extractor   | INFO     | Feature extraction complete — output shape: 3 × 12.
+2026-04-06 19:44:20,050 | features.extractor   | INFO     | Feature extraction pipeline started — 3 packets.
+2026-04-06 19:44:20,052 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:20,059 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
+2026-04-06 19:44:20,060 | features.extractor   | INFO     | Selected 12 columns for model input (10 feature + IP context).
+2026-04-06 19:44:20,061 | features.extractor   | INFO     | Feature extraction complete — output shape: 3 × 12.
+2026-04-06 19:44:20,066 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:20,069 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:20,070 | features.extractor   | ERROR    | Received empty packet list — cannot build DataFrame.
+2026-04-06 19:44:20,071 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:20,077 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
+2026-04-06 19:44:20,078 | features.extractor   | INFO     | Selected 4 columns for model input (2 feature + IP context).
+2026-04-06 19:44:20,079 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:20,091 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
+2026-04-06 19:44:20,094 | features.extractor   | INFO     | Selected 12 columns for model input (10 feature + IP context).
+2026-04-06 19:44:20,095 | features.extractor   | INFO     | Created DataFrame: 3 rows × 6 columns.
+2026-04-06 19:44:20,104 | features.extractor   | INFO     | Engineered 10 feature columns: frame_len, ip_proto, is_tcp, is_udp, tcp_flag_syn, tcp_flag_ack, tcp_flag_fin, tcp_flag_rst, tcp_flag_psh, hour_of_day
+2026-04-06 19:44:20,105 | features.extractor   | WARNING  | Requested columns not found in DataFrame: {'nonexistent_col'}
+2026-04-06 19:44:20,106 | features.extractor   | INFO     | Selected 2 columns for model input (0 feature + IP context).
