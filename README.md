@@ -462,3 +462,79 @@ MIT License — see `LICENSE` for details.
 
 *Built for educational and research purposes. Always obtain proper authorization before
 capturing network traffic on any network you do not own.*
+
+---
+
+## Real-Time Monitoring Mode
+
+The system now supports a realtime streaming mode in addition to batch mode.
+
+### How It Works
+
+1. TShark runs in streaming mode via `subprocess.Popen`.
+2. Packets are read line-by-line from stdout.
+3. Packets are processed in small buffers (default: 5 packets).
+4. Each buffer is passed through:
+   - feature extraction
+   - anomaly detection (Isolation Forest)
+   - attack classification (Random Forest)
+5. Live CLI logs are emitted for normal packets and alerts.
+6. On Ctrl+C, capture stops gracefully and a final report is generated.
+
+### How To Run
+
+Use environment variable `APP_MODE`:
+
+```bash
+# Batch (default)
+APP_MODE=batch python main.py
+
+# Realtime streaming mode
+APP_MODE=realtime python main.py
+```
+
+Optional capture interface override:
+
+```bash
+APP_MODE=realtime CAPTURE_INTERFACE=eth0 python main.py
+```
+
+### Example Realtime CLI Output
+
+```text
+2026-04-06 22:00:01 | [INFO] Packet processed | 10.0.0.1 -> 10.0.0.5
+2026-04-06 22:00:02 | ?? [ALERT] Anomaly detected | 10.0.0.9 -> 10.0.0.3
+2026-04-06 22:00:03 | ?? [ALERT] DDOS detected (confidence: 0.92) | 10.0.0.7 -> 10.0.0.2
+```
+
+### Batch vs Realtime
+
+| Mode | Capture Pattern | Processing Pattern | Output Timing |
+|------|------------------|--------------------|---------------|
+| Batch | Capture first, then process | Full DataFrame pipeline | Report at end |
+| Realtime | Continuous packet stream | Small buffered micro-batches | Live alerts + report on stop |
+
+### Realtime Mode Improvements
+
+Recent improvements for realtime mode:
+
+- Immediate streaming responsiveness using line-buffered TShark output (`-l`).
+- Packet processing buffer reduced for near-instant detection.
+- Live per-packet CLI updates with timestamp and source -> destination.
+- Immediate anomaly/attack alerts while capture is running.
+- Graceful Ctrl+C shutdown with final report generation.
+
+Run realtime mode:
+
+```bash
+set APP_MODE=realtime
+python main.py
+```
+
+Sample CLI output:
+
+```text
+2026-04-06 23:10:12 | [INFO] Packet processed: 10.0.0.1 -> 10.0.0.5
+2026-04-06 23:10:13 | [ALERT] Anomaly detected | 10.0.0.9 -> 10.0.0.3
+2026-04-06 23:10:14 | [ALERT] DDOS detected (confidence: 0.91) | 10.0.0.7 -> 10.0.0.2
+```

@@ -45,3 +45,32 @@ TShark (Live/PCAP)
 | `config/` | System-wide settings | — | Config objects |
 | `data/` | Sample data, labels, PCAP files | — | — |
 | `logs/` | Runtime and event logs | — | `.log` files |
+
+---
+
+## Realtime Streaming Path
+
+In realtime mode (`APP_MODE=realtime`), the pipeline follows a streaming path:
+
+```
+TShark (Popen stream)
+      |
+      v
+capture.stream_packets()   -> yields packet dicts line-by-line
+      |
+      v
+pipeline.realtime_pipeline -> micro-batch buffer (default: 5)
+      |
+      +--> features.extract_features()
+      +--> detection.score_packets()      [models loaded once]
+      +--> classification.predict_attack_types()
+      |
+      v
+Live CLI logs (INFO / ALERT)
+      |
+Ctrl+C
+      v
+visualization.generate_report() -> JSON + PNG charts + HTML report
+```
+
+This path is additive and does not replace the existing batch pipeline.

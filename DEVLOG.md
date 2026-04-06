@@ -39,6 +39,96 @@ Copy and fill this block for every new entry:
 ## ── JOURNAL ──────────────────────────────────────────────────────
 
 ---
+---
+### [2026-04-06] - Fix realtime stream parsing/yield path
+
+**Type:** Bugfix
+**Module(s) affected:** capture/tshark_runner.py
+**Author:** Codex (GPT-5)
+
+#### Changes Made
+- Fixed realtime line parsing to preserve trailing tab-separated empty fields by using strip("\r\n") instead of strip().
+- Added explicit empty-line guard in stream loop (if not line.strip(): continue).
+- Added debug log for raw stream lines: logger.debug("Raw line: %s", clean).
+- Kept safe yield flow:
+  - parse line
+  - skip invalid packets
+  - yield valid packets only
+
+#### Features Added
+- Improved realtime parser observability for live debugging.
+
+#### Bugs Fixed
+- Prevented valid TShark lines from being dropped as malformed due to aggressive whitespace stripping.
+
+#### Notes / Decisions
+- Batch capture path remains unchanged.
+### [2026-04-06] - Realtime mode responsiveness and stability fixes
+
+**Type:** Bugfix
+**Module(s) affected:** main.py, capture/tshark_runner.py, pipeline/realtime_pipeline.py, README.md
+**Author:** Codex (GPT-5)
+
+#### Changes Made
+- Updated mode resolution in main.py to prefer config.mode and fallback to APP_MODE env var.
+- Added explicit realtime mode log line: Pipeline mode selected: realtime.
+- Updated TShark command builder to include -l for line-buffered output (lower latency in realtime stream).
+- Reduced realtime processing buffer from 5 to 1 packet for immediate processing.
+- Improved per-packet live logs in realtime mode:
+  - [INFO] Packet processed: src -> dst
+  - [ALERT] Anomaly detected
+  - [ALERT] <ATTACK> detected (confidence: x.xx)
+- Added debug safety logs in realtime mode:
+  - Realtime pipeline started
+  - Streaming packets...
+  - Packets processed: X
+- Updated README with a new Realtime Mode Improvements section and run instructions.
+
+#### Features Added
+- Faster realtime detection feedback with near-instant packet-level processing.
+
+#### Bugs Fixed
+- Reduced delayed CLI updates caused by larger realtime buffer.
+- Improved reliability of realtime mode selection when env mode is set.
+
+#### Notes / Decisions
+- Batch pipeline behavior remains unchanged.
+- Existing function signatures were preserved.
+
+---
+### [2026-04-06] - Add realtime streaming mode
+
+**Type:** Feature
+**Module(s) affected:** capture/tshark_runner.py, pipeline/realtime_pipeline.py, config/settings.py, main.py, README.md, ARCHITECTURE.md, tests/test_realtime_pipeline.py
+**Author:** Codex (GPT-5)
+
+#### Changes Made
+- Added streaming capture function `stream_packets(interface, fields)` using subprocess.Popen and line-by-line stdout parsing.
+- Added new module `pipeline/realtime_pipeline.py` with `run_realtime_pipeline(config)`.
+- Implemented realtime micro-batch processing (buffer size 5) to avoid per-packet model reload overhead.
+- Loaded Isolation Forest and Random Forest models once at startup for realtime mode.
+- Added live CLI logging format for normal packets and anomalies, including timestamp and source -> destination IP.
+- Added graceful shutdown on KeyboardInterrupt and final report generation after termination when packets were processed.
+- Added pipeline mode selection in `main.py`:
+  - `realtime` -> run_realtime_pipeline
+  - `batch` -> existing batch flow
+- Updated config mode to `batch`/`realtime` and added `APP_MODE` environment override.
+- Added small tests for realtime no-packet safety and report generation behavior.
+- Updated README and ARCHITECTURE with realtime mode documentation and streaming path.
+
+#### Features Added
+- Realtime streaming detection path without breaking existing batch mode.
+- Live anomaly/attack alert logs in CLI.
+- End-of-session report generation in realtime mode.
+
+#### Bugs Fixed
+- N/A (feature addition)
+
+#### Notes / Decisions
+- If realtime stops with zero packets, pipeline exits cleanly and skips report generation to avoid empty-report errors.
+- Realtime processing reuses existing feature extraction, detection, classification, and reporting modules to keep behavior consistent.
+
+---
 ### [2026-04-06] - Implement models/trainer.py (synthetic training pipeline)
 
 **Type:** Feature
@@ -391,6 +481,15 @@ Add new to-do items here. Move to journal when completed.
 
 *Keep this file updated. A good devlog is the difference between a project
 that can be maintained and one that has to be rewritten from scratch.*
+
+
+
+
+
+
+
+
+
 
 
 

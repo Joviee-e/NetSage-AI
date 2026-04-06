@@ -17,7 +17,7 @@ Functions:
 
 import shutil
 import subprocess
-from typing import Dict, List, Optional
+from typing import Dict, Generator, List, Optional
 
 from config.settings import TSHARK_FIELDS
 from utils.logger import setup_logger
@@ -62,6 +62,7 @@ def build_tshark_command(
     fields = fields or list(TSHARK_FIELDS)
 
     cmd: List[str] = [tshark_path]
+    cmd += ["-l"]  # Force line-buffered output (important for realtime mode).
 
     # Source: live interface or pcap file
     if pcap_file:
@@ -188,6 +189,114 @@ def parse_tshark_output(
 
     logger.info("Parsed %d packets from TShark output.", len(packets))
     return packets
+
+
+def _parse_tshark_line(line: str, fields: List[str], line_no: int) -> Optional[Dict[str, str]]:
+    """Parse one tab-separated TShark line into a packet dict.
+
+    Returns None for empty/malformed lines.
+    """
+    # Keep trailing tab-separated empty fields intact.
+    clean = line.rstrip("\r\n")
+    logger.debug("Raw line: %s", clean)
+
+    if not clean.strip():
+        return None
+
+    values = clean.split(FIELD_SEPARATOR)
+    if len(values) != len(fields):
+        logger.warning(
+            "Skipping malformed line %d: expected %d fields, got %d.",
+            line_no,
+            len(fields),
+            len(values),
+        )
+        return None
+
+    return dict(zip(fields, values))
+
+
+def stream_packets(
+    interface: str,
+    fields: Optional[List[str]] = None,
+    tshark_path: str = "tshark",
+) -> Generator[Dict[str, str], None, None]:
+    """Stream packets from TShark line-by-line using subprocess.Popen.
+
+    Args:
+        interface: Network interface name for live capture.
+        fields: Optional field list to extract.
+        tshark_path: Path to the tshark binary.
+
+    Yields:
+        Parsed packet dictionaries.
+
+    Raises:
+        ValueError: If interface is not provided.
+        FileNotFoundError: If tshark is not installed.
+    """
+    if not interface:
+        raise ValueError("interface is required for stream_packets().")
+
+    fields = fields or list(TSHARK_FIELDS)
+    cmd = build_tshark_command(
+        interface=interface,
+        duration=None,
+        pcap_file=None,
+        fields=fields,
+        tshark_path=tshark_path,
+    )
+
+    tshark_bin = cmd[0]
+    if shutil.which(tshark_bin) is None:
+        logger.error("TShark binary '%s' not found on PATH.", tshark_bin)
+        raise FileNotFoundError(
+            f"TShark binary '{tshark_bin}' not found on system PATH."
+        )
+
+    logger.info("Starting TShark stream: %s", " ".join(cmd))
+    process = subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        bufsize=1,
+    )
+
+    try:
+        if process.stdout is None:
+            raise RuntimeError("Failed to attach to TShark stdout stream.")
+
+        for line_no, line in enumerate(process.stdout, start=1):
+            if not line.strip():
+                continue
+
+            packet = _parse_tshark_line(line, fields, line_no)
+            if packet is None:
+                continue
+
+            yield packet
+    finally:
+        if process.poll() is None:
+            process.terminate()
+            try:
+                process.wait(timeout=2)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait(timeout=2)
+
+        stderr_msg = ""
+        if process.stderr is not None:
+            stderr_msg = process.stderr.read().strip()
+
+        if process.returncode not in (None, 0, -15):
+            logger.error(
+                "TShark stream exited with code %d â€” stderr: %s",
+                process.returncode,
+                stderr_msg or "(no stderr)",
+            )
+        else:
+            logger.info("TShark stream stopped.")
 
 
 def start_capture(
