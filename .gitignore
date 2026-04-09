@@ -8,3 +8,5 @@ models/saved/*.pkl
 __pycache__/
 *.pyc
 data/
+logs/
+*.log
