@@ -1,23 +1,19 @@
 """
-models/trainer.py - Minimal training script for anomaly + attack models.
-
-Trains and saves:
-    1) IsolationForest for anomaly detection
-    2) RandomForestClassifier for attack classification
-
-Uses synthetic data only (no external dataset).
+models/trainer.py - Training entrypoint for synthetic and CICIDS2017 data.
 """
 
 from __future__ import annotations
 
 import os
 import pickle
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import IsolationForest, RandomForestClassifier
 
+from models.dataset_loader import load_cicids_features_labels
+from models.feature_schema import FEATURES_SCHEMA_PATH, save_feature_schema
 from utils.logger import setup_logger
 
 logger = setup_logger("models.trainer")
@@ -25,6 +21,9 @@ logger = setup_logger("models.trainer")
 MODEL_DIR = os.path.join("models", "saved")
 ISOLATION_PATH = os.path.join(MODEL_DIR, "isolation_forest.pkl")
 CLASSIFIER_PATH = os.path.join(MODEL_DIR, "random_forest.pkl")
+DEFAULT_CICIDS_PATH = os.path.join("data", "raw", "cicids2017")
+MAX_NORMAL_ROWS = 300_000
+MAX_CLASSIFIER_ROWS = 500_000
 
 FEATURE_COLUMNS: List[str] = [
     "frame_len",
@@ -104,17 +103,17 @@ def generate_synthetic_data(n_rows: int = 1000, random_state: int = 42) -> pd.Da
     return pd.DataFrame(rows)
 
 
-def train_isolation_forest(df: pd.DataFrame) -> IsolationForest:
+def train_isolation_forest(df: pd.DataFrame, feature_columns: List[str]) -> IsolationForest:
     """Train IsolationForest on feature columns only."""
     model = IsolationForest(contamination=0.2, random_state=42)
-    model.fit(df[FEATURE_COLUMNS])
+    model.fit(df[feature_columns])
     return model
 
 
-def train_random_forest(df: pd.DataFrame) -> RandomForestClassifier:
+def train_random_forest(df: pd.DataFrame, feature_columns: List[str]) -> RandomForestClassifier:
     """Train RandomForestClassifier on labeled attack_type values."""
-    model = RandomForestClassifier(n_estimators=200, random_state=42)
-    model.fit(df[FEATURE_COLUMNS], df["attack_type"])
+    model = RandomForestClassifier(n_estimators=150, random_state=42, n_jobs=1)
+    model.fit(df[feature_columns], df["attack_type"])
     return model
 
 
@@ -131,16 +130,79 @@ def run_training(n_rows: int = 1000) -> Tuple[str, str]:
 
     df = generate_synthetic_data(n_rows=n_rows)
 
-    isolation_model = train_isolation_forest(df)
-    classifier_model = train_random_forest(df)
+    isolation_model = train_isolation_forest(df, FEATURE_COLUMNS)
+    classifier_model = train_random_forest(df, FEATURE_COLUMNS)
 
     save_model(isolation_model, ISOLATION_PATH)
     save_model(classifier_model, CLASSIFIER_PATH)
 
-    logger.info("Models saved: %s, %s", ISOLATION_PATH, CLASSIFIER_PATH)
+    save_feature_schema(FEATURE_COLUMNS, FEATURES_SCHEMA_PATH)
+    logger.info(
+        "Models saved (synthetic): %s, %s | schema: %s",
+        ISOLATION_PATH,
+        CLASSIFIER_PATH,
+        FEATURES_SCHEMA_PATH,
+    )
     logger.info("Training completed.")
     return ISOLATION_PATH, CLASSIFIER_PATH
 
 
+def train_from_cicids(data_path: str = DEFAULT_CICIDS_PATH) -> Dict[str, str]:
+    """Train models using CICIDS2017 and save model artifacts + feature schema."""
+    logger.info("CICIDS training started. Dataset path: %s", data_path)
+    X, y = load_cicids_features_labels(data_path)
+
+    feature_columns = list(X.columns)
+    df = X.copy()
+    df["attack_type"] = y
+
+    normal_df = df[df["attack_type"] == "normal"]
+    if normal_df.empty:
+        raise ValueError("No 'normal' rows found in CICIDS dataset for IsolationForest.")
+
+    if len(normal_df) > MAX_NORMAL_ROWS:
+        normal_df = normal_df.sample(n=MAX_NORMAL_ROWS, random_state=42)
+        logger.info("Downsampled normal rows for anomaly training to %d", len(normal_df))
+
+    if len(df) > MAX_CLASSIFIER_ROWS:
+        sampled_parts = []
+        for _, group in df.groupby("attack_type", group_keys=False):
+            frac = MAX_CLASSIFIER_ROWS / len(df)
+            n_group = max(1, int(len(group) * frac))
+            sampled_parts.append(group.sample(n=min(len(group), n_group), random_state=42))
+        df = pd.concat(sampled_parts, ignore_index=True)
+        logger.info("Downsampled rows for classifier training to %d", len(df))
+
+    logger.info(
+        "Dataset ready. Rows for classifier: %d | Rows for anomaly: %d | Features: %d",
+        len(df),
+        len(normal_df),
+        len(feature_columns),
+    )
+
+    isolation_model = train_isolation_forest(normal_df, feature_columns)
+    classifier_model = train_random_forest(df, feature_columns)
+
+    save_model(isolation_model, ISOLATION_PATH)
+    save_model(classifier_model, CLASSIFIER_PATH)
+    save_feature_schema(feature_columns, FEATURES_SCHEMA_PATH)
+
+    logger.info("CICIDS models saved: %s, %s", ISOLATION_PATH, CLASSIFIER_PATH)
+    logger.info("CICIDS feature schema saved: %s", FEATURES_SCHEMA_PATH)
+
+    return {
+        "isolation_model_path": ISOLATION_PATH,
+        "classifier_model_path": CLASSIFIER_PATH,
+        "features_schema_path": FEATURES_SCHEMA_PATH,
+    }
+
+
 if __name__ == "__main__":
-    run_training()
+    if os.path.isdir(DEFAULT_CICIDS_PATH):
+        train_from_cicids(DEFAULT_CICIDS_PATH)
+    else:
+        logger.warning(
+            "CICIDS dataset directory not found at %s. Falling back to synthetic training.",
+            DEFAULT_CICIDS_PATH,
+        )
+        run_training()
