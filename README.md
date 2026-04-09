@@ -570,6 +570,21 @@ Sample CLI output:
 2026-04-06 23:10:14 | [ALERT] DDOS detected (confidence: 0.91) | 10.0.0.7 -> 10.0.0.2
 ```
 
+## Hybrid Realtime Validation Fallback
+
+Realtime mode now includes a simple rule-based fallback for validation/demo visibility:
+
+- After ML scoring/classification, if `frame_len > 1200` and the packet is not already anomalous:
+  - `is_anomaly = 1`
+  - `attack_type = "suspicious_traffic"`
+  - `attack_confidence = 0.9`
+
+Notes:
+
+- This is realtime-only and does not affect batch processing.
+- ML models are unchanged and still run first.
+- Fallback rule only supplements ML output; it does not replace it.
+
 ## Colored CLI Alerts
 
 Realtime CLI alerts now use ANSI colors for better visibility during live capture.

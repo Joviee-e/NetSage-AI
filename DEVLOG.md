@@ -39,6 +39,39 @@ Copy and fill this block for every new entry:
 ## ── JOURNAL ──────────────────────────────────────────────────────
 
 ---
+### [2026-04-10] - Add hybrid realtime anomaly fallback rule
+
+**Type:** Feature
+**Module(s) affected:** pipeline/realtime_pipeline.py, README.md
+**Author:** Codex (GPT-5)
+
+#### Changes Made
+- Added realtime-only rule fallback in `pipeline/realtime_pipeline.py` after ML scoring/classification.
+- Implemented rule:
+  - if `frame_len > 1200` and packet is not already flagged by ML, set:
+    - `is_anomaly = 1`
+    - `attack_type = "suspicious_traffic"`
+    - `attack_confidence = 0.9`
+- Kept ML anomaly detection/classification path unchanged.
+- Updated alert text formatting so CLI now shows lowercase labels as stored, including:
+  - `🚨 [ALERT] suspicious_traffic detected (confidence: 0.90)`
+- Verified realtime tests still pass.
+
+#### Features Added
+- Hybrid anomaly detection behavior for realtime validation/demo runs.
+- Visible alert generation even when ML cannot flag due to schema mismatch scenarios.
+
+#### Bugs Fixed
+- Reduced false "silent runs" during realtime demos where no alert appears because ML cannot trigger on feature mismatch.
+
+#### Notes / Decisions
+- Rule is scoped to realtime pipeline only; batch flow remains unchanged.
+- Rule does not replace ML; it only supplements existing results.
+- Validation run:
+  - `python -m pytest tests/test_realtime_pipeline.py -q`
+  - result: `2 passed`.
+
+---
 ### [2026-04-09] - Upgrade training to CICIDS2017 with schema-safe inference fallback
 
 **Type:** Feature

@@ -30,6 +30,29 @@ def _format_ts() -> str:
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
+def _apply_realtime_rule_fallback(df: pd.DataFrame) -> pd.DataFrame:
+    """Apply realtime-only rule fallback without replacing ML decisions.
+
+    Rule:
+        if frame_len > 1200 and packet is not already flagged by ML:
+            is_anomaly = 1
+            attack_type = suspicious_traffic
+            attack_confidence = 0.9
+    """
+    if df.empty or "frame_len" not in df.columns:
+        return df
+
+    result = df.copy()
+    rule_mask = (result["frame_len"] > 1200) & (result["is_anomaly"] != 1)
+    if rule_mask.any():
+        result.loc[rule_mask, "is_anomaly"] = 1
+        result.loc[rule_mask, "attack_type"] = "suspicious_traffic"
+        result.loc[rule_mask, "attack_confidence"] = 0.9
+        logger.info("Realtime rule fallback flagged %d packets.", int(rule_mask.sum()))
+
+    return result
+
+
 def _process_packet_buffer(
     packet_buffer: List[Dict[str, str]],
     anomaly_model,
@@ -42,7 +65,7 @@ def _process_packet_buffer(
     features_df = extract_features(packet_buffer)
     scored_df = score_packets(features_df, anomaly_model)
     classified_df = predict_attack_types(scored_df, classifier_model)
-    return classified_df
+    return _apply_realtime_rule_fallback(classified_df)
 
 
 def _emit_live_logs(result_df: pd.DataFrame) -> None:
@@ -56,7 +79,7 @@ def _emit_live_logs(result_df: pd.DataFrame) -> None:
             attack = str(row.get("attack_type", "anomaly"))
             conf = float(row.get("attack_confidence", 0.0))
             if attack and attack.lower() != "normal":
-                attack_type = attack.upper()
+                attack_type = attack
                 confidence = conf
                 logger.warning(
                     f"{stamp} | {RED}\U0001F6A8 [ALERT] {attack_type} detected (confidence: {confidence:.2f}){RESET} | {src_ip} -> {dst_ip}"
