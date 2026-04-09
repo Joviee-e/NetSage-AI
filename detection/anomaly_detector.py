@@ -18,11 +18,12 @@ from __future__ import annotations
 import os
 import pickle
 import tempfile
-from typing import Any
+from typing import Any, List, Optional
 
 import pandas as pd
 from sklearn.ensemble import IsolationForest
 
+from models.feature_schema import load_feature_schema
 from utils.logger import setup_logger
 
 logger = setup_logger("detection.anomaly_detector")
@@ -60,7 +61,33 @@ def load_anomaly_model(model_path: str) -> IsolationForest:
     return model
 
 
-def score_packets(df: pd.DataFrame, model: IsolationForest) -> pd.DataFrame:
+def _resolve_feature_columns(
+    df: pd.DataFrame,
+    model: IsolationForest,
+    feature_columns: Optional[List[str]] = None,
+) -> List[str]:
+    """Determine feature columns from explicit schema, model metadata, or numeric fallback."""
+    if feature_columns:
+        return list(feature_columns)
+
+    schema_features = load_feature_schema()
+    if schema_features:
+        return list(schema_features)
+
+    if hasattr(model, "feature_names_in_"):
+        return [str(c) for c in model.feature_names_in_]
+
+    excluded_cols = {"is_anomaly", "anomaly_score", "attack_type", "attack_confidence"}
+    numeric_features = df.select_dtypes(include=["number", "bool"])
+    return [c for c in numeric_features.columns if c not in excluded_cols]
+
+
+def score_packets(
+    df: pd.DataFrame,
+    model: IsolationForest,
+    feature_columns: Optional[List[str]] = None,
+    strict_schema: bool = False,
+) -> pd.DataFrame:
     """Score packets and append anomaly columns.
 
     Mapping:
@@ -72,12 +99,14 @@ def score_packets(df: pd.DataFrame, model: IsolationForest) -> pd.DataFrame:
     Args:
         df: Feature DataFrame with one row per packet.
         model: Trained IsolationForest model.
+        feature_columns: Optional explicit feature list.
+        strict_schema: Raise on feature mismatch when True.
 
     Returns:
         Copy of df with added columns: is_anomaly, anomaly_score.
 
     Raises:
-        ValueError: If df is invalid/empty or has no numeric feature columns.
+        ValueError: If df/model is invalid or strict schema mismatch occurs.
     """
     if not isinstance(df, pd.DataFrame):
         raise ValueError("df must be a pandas DataFrame.")
@@ -89,16 +118,28 @@ def score_packets(df: pd.DataFrame, model: IsolationForest) -> pd.DataFrame:
     ):
         raise ValueError("model must support predict() and decision_function().")
 
-    # Exclude output columns if the DataFrame is rescored.
-    excluded_cols = {"is_anomaly", "anomaly_score"}
-    feature_df = df.drop(columns=[c for c in excluded_cols if c in df.columns])
+    required_features = _resolve_feature_columns(df, model, feature_columns)
+    if not required_features:
+        raise ValueError("No feature columns resolved for anomaly scoring.")
 
-    numeric_features = feature_df.select_dtypes(include=["number", "bool"])
-    if numeric_features.empty:
-        raise ValueError("Input DataFrame has no numeric feature columns to score.")
+    missing = [c for c in required_features if c not in df.columns]
+    if missing:
+        message = (
+            "Missing required feature columns for anomaly model: "
+            f"{missing}. This usually indicates packet-level vs flow-level schema mismatch."
+        )
+        if strict_schema:
+            raise ValueError(message)
+        logger.warning("%s Falling back to no-op anomaly output.", message)
+        fallback = df.copy()
+        fallback["is_anomaly"] = 0
+        fallback["anomaly_score"] = 0.0
+        return fallback
 
-    predictions = model.predict(numeric_features)
-    scores = model.decision_function(numeric_features)
+    feature_df = df[required_features]
+
+    predictions = model.predict(feature_df)
+    scores = model.decision_function(feature_df)
 
     result = df.copy()
     result["is_anomaly"] = (predictions == -1).astype(int)

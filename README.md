@@ -379,6 +379,37 @@ python main.py
 python -m models.trainer
 ```
 
+## Training with Real Dataset (CICIDS 2017)
+
+Dataset location:
+
+- `data/raw/cicids2017/` (all CICIDS2017 CSV files)
+
+Train command:
+
+```bash
+python -m models.trainer
+```
+
+What training now does:
+
+- Loads and concatenates all CICIDS2017 CSV files
+- Cleans data (`inf -> NaN`, then drops NaN rows)
+- Normalizes column names to lowercase snake_case
+- Trains `IsolationForest` using only `normal` (BENIGN) rows
+- Trains `RandomForestClassifier` using all labels
+- Saves artifacts to `models/saved/`:
+  - `isolation_forest.pkl`
+  - `random_forest.pkl`
+  - `features.json` (feature schema used by both models)
+
+Feature compatibility note:
+
+- CICIDS models are trained on flow-level features.
+- Realtime packet pipeline still runs unchanged.
+- If runtime features do not match `features.json`, inference falls back safely (no crash) and logs a warning.
+- Synthetic training fallback is still available when CICIDS data is missing.
+
 ---
 
 ## 📊 Output

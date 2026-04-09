@@ -22,11 +22,12 @@ from __future__ import annotations
 import os
 import pickle
 import tempfile
-from typing import Dict
+from typing import Dict, List, Optional
 
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 
+from models.feature_schema import load_feature_schema
 from utils.logger import setup_logger
 
 logger = setup_logger("classification.attack_classifier")
@@ -64,41 +65,62 @@ def load_classifier(model_path: str) -> RandomForestClassifier:
     return model
 
 
-def _select_classifier_features(
+def _resolve_feature_columns(
     anomalies_df: pd.DataFrame,
     model: RandomForestClassifier,
-) -> pd.DataFrame:
-    """Select input features for classifier inference.
+    feature_columns: Optional[List[str]] = None,
+) -> List[str]:
+    """Resolve classification feature columns from schema/model/fallback."""
+    if feature_columns:
+        return list(feature_columns)
 
-    Prefers exact model.feature_names_in_ when available. Falls back to all
-    numeric/bool columns excluding known output/control columns.
-    """
+    schema_features = load_feature_schema()
+    if schema_features:
+        return list(schema_features)
+
+    if hasattr(model, "feature_names_in_"):
+        return [str(c) for c in model.feature_names_in_]
+
     excluded = {
         "is_anomaly",
         "anomaly_score",
         "attack_type",
         "attack_confidence",
     }
-
-    if hasattr(model, "feature_names_in_"):
-        needed = list(model.feature_names_in_)
-        missing = [c for c in needed if c not in anomalies_df.columns]
-        if missing:
-            raise ValueError(
-                f"Missing required feature columns for classifier: {missing}"
-            )
-        return anomalies_df[needed]
-
     numeric = anomalies_df.select_dtypes(include=["number", "bool"])
-    feature_cols = [c for c in numeric.columns if c not in excluded]
-    if not feature_cols:
-        raise ValueError("No numeric feature columns available for classification.")
-    return anomalies_df[feature_cols]
+    return [c for c in numeric.columns if c not in excluded]
+
+
+def _select_classifier_features(
+    anomalies_df: pd.DataFrame,
+    model: RandomForestClassifier,
+    feature_columns: Optional[List[str]] = None,
+    strict_schema: bool = False,
+) -> Optional[pd.DataFrame]:
+    """Select classifier input features, optionally falling back on schema mismatch."""
+    needed = _resolve_feature_columns(anomalies_df, model, feature_columns)
+    if not needed:
+        raise ValueError("No feature columns resolved for classification.")
+
+    missing = [c for c in needed if c not in anomalies_df.columns]
+    if missing:
+        message = (
+            "Missing required feature columns for classifier: "
+            f"{missing}. This usually indicates packet-level vs flow-level schema mismatch."
+        )
+        if strict_schema:
+            raise ValueError(message)
+        logger.warning("%s Falling back to anomaly-only labels.", message)
+        return None
+
+    return anomalies_df[needed]
 
 
 def predict_attack_types(
     df: pd.DataFrame,
     model: RandomForestClassifier,
+    feature_columns: Optional[List[str]] = None,
+    strict_schema: bool = False,
 ) -> pd.DataFrame:
     """Predict attack labels and confidence for anomalous rows only.
 
@@ -109,12 +131,14 @@ def predict_attack_types(
     Args:
         df: Input DataFrame containing at least is_anomaly column.
         model: Trained RandomForestClassifier.
+        feature_columns: Optional explicit feature list.
+        strict_schema: Raise on feature mismatch when True.
 
     Returns:
         DataFrame with attack_type and attack_confidence columns added.
 
     Raises:
-        ValueError: If DataFrame/model is invalid or required columns are missing.
+        ValueError: If DataFrame/model is invalid or strict schema mismatch occurs.
     """
     if not isinstance(df, pd.DataFrame):
         raise ValueError("df must be a pandas DataFrame.")
@@ -141,7 +165,18 @@ def predict_attack_types(
         logger.info("No anomalies found; skipped classifier model inference.")
         return result
 
-    features = _select_classifier_features(anomalies, model)
+    features = _select_classifier_features(
+        anomalies,
+        model,
+        feature_columns=feature_columns,
+        strict_schema=strict_schema,
+    )
+
+    # Compatibility fallback: anomaly detected but classifier model cannot run.
+    if features is None:
+        result.loc[anomaly_mask, "attack_type"] = "anomaly"
+        result.loc[anomaly_mask, "attack_confidence"] = 0.0
+        return result
 
     predicted_labels = model.predict(features)
     proba = model.predict_proba(features)

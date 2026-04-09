@@ -1,4 +1,4 @@
-# DEVLOG — AI-Based Network Anomaly Detection System
+﻿# DEVLOG — AI-Based Network Anomaly Detection System
 
 > **Purpose:** This file is the living development journal for this project.
 > Every change, fix, addition, and decision must be recorded here.
@@ -39,6 +39,41 @@ Copy and fill this block for every new entry:
 ## ── JOURNAL ──────────────────────────────────────────────────────
 
 ---
+### [2026-04-09] - Upgrade training to CICIDS2017 with schema-safe inference fallback
+
+**Type:** Feature
+**Module(s) affected:** models/dataset_loader.py, models/feature_schema.py, models/trainer.py, detection/anomaly_detector.py, classification/attack_classifier.py, README.md
+**Author:** Codex (GPT-5)
+
+#### Changes Made
+- Added `models/dataset_loader.py` to load and preprocess CICIDS2017 CSV files from `data/raw/cicids2017/`.
+- Added `models/feature_schema.py` for shared feature-schema save/load via `models/saved/features.json`.
+- Updated `models/trainer.py` with `train_from_cicids(data_path)` and default execution via `python -m models.trainer`.
+- Trained Isolation Forest on only `normal` rows and Random Forest on full label set.
+- Added large-dataset downsampling safeguards for reliable CICIDS training runtime.
+- Updated `detection/anomaly_detector.py` to load schema and guard feature mismatch with safe fallback.
+- Updated `classification/attack_classifier.py` to load schema and guard feature mismatch with safe fallback.
+- Updated README with "Training with Real Dataset (CICIDS 2017)" section.
+
+#### Features Added
+- Real CICIDS2017 training pipeline while preserving synthetic fallback.
+- Saved feature contract artifact: `models/saved/features.json`.
+- Realtime-safe compatibility mode when packet-level features do not match flow-level model schema.
+
+#### Bugs Fixed
+- Prevented runtime crashes from model/input feature mismatch by adding guarded fallback behavior.
+
+#### Notes / Decisions
+- Implemented Option A compatibility layer: keep realtime pipeline unchanged; warn and degrade safely on mismatch.
+- Training artifacts generated from CICIDS run:
+  - `models/saved/isolation_forest.pkl`
+  - `models/saved/random_forest.pkl`
+  - `models/saved/features.json` (78 features)
+- Regression verification run:
+  - `python -m pytest tests/test_features.py tests/test_realtime_pipeline.py -q`
+  - result: `26 passed`.
+
+---
 ---
 ### [2026-04-06] - Fix realtime stream parsing/yield path
 
@@ -47,7 +82,8 @@ Copy and fill this block for every new entry:
 **Author:** Codex (GPT-5)
 
 #### Changes Made
-- Fixed realtime line parsing to preserve trailing tab-separated empty fields by using strip("\r\n") instead of strip().
+- Fixed realtime line parsing to preserve trailing tab-separated empty fields by using 
+strip("\r\n") instead of strip().
 - Added explicit empty-line guard in stream loop (if not line.strip(): continue).
 - Added debug log for raw stream lines: logger.debug("Raw line: %s", clean).
 - Kept safe yield flow:
@@ -249,7 +285,7 @@ Copy and fill this block for every new entry:
 - JSON serialization uses `default=str` so non-JSON-native values (if present) are still persisted safely.
 
 ---
-### [2026-04-06] � Implement classification/attack_classifier.py
+### [2026-04-06] � Implement classification/attack_classifier.py
 
 **Type:** Feature
 **Module(s) affected:** classification/attack_classifier.py
