@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+from collections import deque
 from datetime import datetime
-from typing import Dict, List
+from typing import Deque, Dict, List
 
 import colorama
 import pandas as pd
@@ -24,6 +25,65 @@ YELLOW = "\033[93m"
 RESET = "\033[0m"
 
 colorama.init()
+
+ANOMALY_WINDOW_SECONDS = 10
+ANOMALY_THRESHOLD = 5
+TRAFFIC_WINDOW_SECONDS = 1
+TRAFFIC_THRESHOLD = 200
+
+
+class AlertFilter:
+    """Stateful threshold gate for realtime alert suppression."""
+
+    def __init__(
+        self,
+        anomaly_window_seconds: int = ANOMALY_WINDOW_SECONDS,
+        anomaly_threshold: int = ANOMALY_THRESHOLD,
+        traffic_window_seconds: int = TRAFFIC_WINDOW_SECONDS,
+        traffic_threshold: int = TRAFFIC_THRESHOLD,
+    ) -> None:
+        self.anomaly_window_seconds = anomaly_window_seconds
+        self.anomaly_threshold = anomaly_threshold
+        self.traffic_window_seconds = traffic_window_seconds
+        self.traffic_threshold = traffic_threshold
+        self.packet_timestamps: Deque[float] = deque()
+        self.anomaly_timestamps: Deque[float] = deque()
+
+    @staticmethod
+    def _trim_window(window: Deque[float], now_ts: float, max_age_seconds: int) -> None:
+        cutoff = now_ts - max_age_seconds
+        while window and window[0] < cutoff:
+            window.popleft()
+
+    def register_packet(self, is_anomaly: bool, now_ts: float | None = None) -> None:
+        """Track packet/anomaly timestamps in sliding windows."""
+        timestamp = datetime.now().timestamp() if now_ts is None else now_ts
+        self.packet_timestamps.append(timestamp)
+        self._trim_window(self.packet_timestamps, timestamp, self.traffic_window_seconds)
+
+        if is_anomaly:
+            self.anomaly_timestamps.append(timestamp)
+        self._trim_window(self.anomaly_timestamps, timestamp, self.anomaly_window_seconds)
+
+    def evaluate_and_alert(self) -> None:
+        """Emit aggregated alerts only when thresholds are exceeded.
+
+        Cooldown behavior: relevant counters are reset immediately after alert
+        emission to prevent repetitive warning spam.
+        """
+        anomaly_count = len(self.anomaly_timestamps)
+        packets_per_second = len(self.packet_timestamps) / max(
+            self.traffic_window_seconds,
+            1,
+        )
+
+        if anomaly_count > self.anomaly_threshold:
+            logger.warning("🚨 HIGH ANOMALY RATE DETECTED")
+            self.anomaly_timestamps.clear()
+
+        if packets_per_second > self.traffic_threshold:
+            logger.warning("🚨 TRAFFIC SPIKE DETECTED")
+            self.packet_timestamps.clear()
 
 
 def _format_ts() -> str:
@@ -68,29 +128,33 @@ def _process_packet_buffer(
     return _apply_realtime_rule_fallback(classified_df)
 
 
-def _emit_live_logs(result_df: pd.DataFrame) -> None:
-    """Emit concise per-packet realtime logs for CLI visibility."""
+def _emit_live_logs(result_df: pd.DataFrame, alert_filter: AlertFilter) -> None:
+    """Emit realtime visibility logs and threshold-gated aggregate alerts."""
     for _, row in result_df.iterrows():
         src_ip = row.get("ip.src", "unknown")
         dst_ip = row.get("ip.dst", "unknown")
         stamp = _format_ts()
+        is_anomaly = int(row.get("is_anomaly", 0)) == 1
+        alert_filter.register_packet(is_anomaly=is_anomaly)
 
-        if int(row.get("is_anomaly", 0)) == 1:
+        if is_anomaly:
             attack = str(row.get("attack_type", "anomaly"))
             conf = float(row.get("attack_confidence", 0.0))
             if attack and attack.lower() != "normal":
                 attack_type = attack
                 confidence = conf
-                logger.warning(
-                    f"{stamp} | {RED}\U0001F6A8 [ALERT] {attack_type} detected (confidence: {confidence:.2f}){RESET} | {src_ip} -> {dst_ip}"
+                logger.info(
+                    f"{stamp} | {YELLOW}[ANOMALY] {attack_type} detected (confidence: {confidence:.2f}){RESET} | {src_ip} -> {dst_ip}"
                 )
             else:
-                logger.warning(
-                    f"{stamp} | {RED}\U0001F6A8 [ALERT] Anomaly detected{RESET} | {src_ip} -> {dst_ip}"
+                logger.info(
+                    f"{stamp} | {YELLOW}[ANOMALY] Anomaly detected{RESET} | {src_ip} -> {dst_ip}"
                 )
         else:
             # Keep realtime CLI focused on alerts; progress is logged periodically.
             pass
+
+        alert_filter.evaluate_and_alert()
 
 
 def run_realtime_pipeline(config) -> pd.DataFrame:
@@ -112,6 +176,7 @@ def run_realtime_pipeline(config) -> pd.DataFrame:
     results: List[pd.DataFrame] = []
     packet_buffer: List[Dict[str, str]] = []
     processed_packets = 0
+    alert_filter = AlertFilter()
 
     try:
         for packet in stream_packets(
@@ -128,7 +193,7 @@ def run_realtime_pipeline(config) -> pd.DataFrame:
                     classifier_model,
                 )
                 if not batch_df.empty:
-                    _emit_live_logs(batch_df)
+                    _emit_live_logs(batch_df, alert_filter)
                     results.append(batch_df)
                     processed_packets += len(batch_df)
                     if processed_packets % 50 == 0:
@@ -151,7 +216,7 @@ def run_realtime_pipeline(config) -> pd.DataFrame:
                 classifier_model,
             )
             if not batch_df.empty:
-                _emit_live_logs(batch_df)
+                _emit_live_logs(batch_df, alert_filter)
                 results.append(batch_df)
                 processed_packets += len(batch_df)
                 if processed_packets % 50 == 0:

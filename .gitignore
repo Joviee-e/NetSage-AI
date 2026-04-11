@@ -1,8 +1,8 @@
 # Output files
 output/
 
-# Model files (optional, see below)
-models/saved/*.pkl
+# Model files
+models/saved/
 
 # Python cache
 __pycache__/

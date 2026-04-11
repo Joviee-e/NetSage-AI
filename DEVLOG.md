@@ -39,6 +39,40 @@ Copy and fill this block for every new entry:
 ## ── JOURNAL ──────────────────────────────────────────────────────
 
 ---
+### [2026-04-11] - Add realtime threshold-based alert filtering with cooldown
+
+**Type:** Feature
+**Module(s) affected:** pipeline/realtime_pipeline.py, tests/test_realtime_pipeline.py
+**Author:** Codex (GPT-5)
+
+#### Changes Made
+- Added a new `AlertFilter` state manager in `pipeline/realtime_pipeline.py` to track:
+  - packet timestamps in a sliding traffic window
+  - anomaly timestamps in a sliding anomaly window
+- Implemented threshold constants and checks:
+  - anomaly threshold: `> 5` anomalies in `10` seconds
+  - traffic threshold: `> 200` packets per second
+- Updated realtime logging path so threshold warnings are emitted only from the filter:
+  - `🚨 HIGH ANOMALY RATE DETECTED`
+  - `🚨 TRAFFIC SPIKE DETECTED`
+- Changed per-packet anomaly output from warning-level alerts to info-level anomaly visibility logs to reduce warning spam.
+- Wired filter lifecycle into `run_realtime_pipeline` so it is maintained for the full stream session.
+- Added tests for:
+  - anomaly threshold trigger + cooldown reset
+  - traffic threshold trigger + cooldown reset
+
+#### Features Added
+- Sliding-window alert gating for realtime mode.
+- Cooldown behavior by clearing relevant counters immediately after threshold-based alert emission.
+
+#### Bugs Fixed
+- Reduced repeated warning spam caused by per-packet anomaly warnings in burst traffic.
+
+#### Notes / Decisions
+- Threshold comparisons are strict (`>`), matching requirement wording: trigger when exceeded.
+- Existing realtime processing, report generation, and model inference flow remain unchanged.
+
+---
 ### [2026-04-10] - Add hybrid realtime anomaly fallback rule
 
 **Type:** Feature
