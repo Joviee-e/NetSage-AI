@@ -39,6 +39,40 @@ Copy and fill this block for every new entry:
 ## ── JOURNAL ──────────────────────────────────────────────────────
 
 ---
+### [2026-04-11] - Add Telegram threshold notifications with secure env handling
+
+**Type:** Feature
+**Module(s) affected:** utils/notifier.py, pipeline/realtime_pipeline.py, tests/test_realtime_pipeline.py, README.md, requirements.txt, .gitignore, .env
+**Author:** Codex (GPT-5)
+
+#### Changes Made
+- Added new `utils/notifier.py` module with `send_telegram_alert(message)`.
+- Implemented secure env-based Telegram credential loading via `python-dotenv`:
+  - `TELEGRAM_BOT_TOKEN`
+  - `TELEGRAM_CHAT_ID`
+- Integrated Telegram notifications into realtime threshold alerts only:
+  - anomaly threshold branch sends: `🚨 High anomaly rate detected`
+  - traffic threshold branch sends: `⚠️ Traffic spike detected`
+- Kept notification behavior non-blocking:
+  - silent return if env vars are missing
+  - catches `requests` exceptions to avoid breaking pipeline/report flow
+- Added `.env` to `.gitignore` and created a root `.env` template with placeholder keys.
+- Added required dependencies: `requests`, `python-dotenv`.
+- Updated README with "Telegram Notifications Setup (Optional)" instructions.
+- Extended realtime tests to verify Telegram notifications are called on threshold alerts and not called when thresholds are not exceeded.
+
+#### Features Added
+- Remote mobile notifications via Telegram Bot API for meaningful aggregate alerts.
+- Secure credential management suitable for public repositories.
+
+#### Bugs Fixed
+- N/A (feature addition)
+
+#### Notes / Decisions
+- Notification sends are strictly threshold-based and never per-packet.
+- Existing CLI logging and report generation behavior remain intact.
+
+---
 ### [2026-04-11] - Add realtime threshold-based alert filtering with cooldown
 
 **Type:** Feature

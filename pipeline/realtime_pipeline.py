@@ -14,6 +14,7 @@ from classification.attack_classifier import load_classifier, predict_attack_typ
 from detection.anomaly_detector import load_anomaly_model, score_packets
 from features.extractor import extract_features
 from utils.logger import setup_logger
+from utils.notifier import send_telegram_alert
 from visualization.report_generator import generate_report
 
 logger = setup_logger("pipeline.realtime")
@@ -79,10 +80,12 @@ class AlertFilter:
 
         if anomaly_count > self.anomaly_threshold:
             logger.warning("🚨 HIGH ANOMALY RATE DETECTED")
+            send_telegram_alert("🚨 High anomaly rate detected")
             self.anomaly_timestamps.clear()
 
         if packets_per_second > self.traffic_threshold:
             logger.warning("🚨 TRAFFIC SPIKE DETECTED")
+            send_telegram_alert("⚠️ Traffic spike detected")
             self.packet_timestamps.clear()
 
 

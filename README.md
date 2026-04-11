@@ -228,6 +228,7 @@ Key functions:
 
 ### `utils/`
 - **`logger.py`** — `setup_logger(name)` — console + rotating file logging
+- **`notifier.py`** - `send_telegram_alert(message)` for Telegram threshold alerts
 - **`validators.py`** — sanity check packets, DataFrames, model files, interfaces
 - **`file_helpers.py`** — CSV/JSON I/O and directory creation helpers
 
@@ -320,7 +321,29 @@ pandas>=2.0
 numpy>=1.24
 scikit-learn>=1.3
 matplotlib>=3.7
+colorama>=0.4
+requests>=2.31
+python-dotenv>=1.0
 ```
+
+### 4.1 Telegram Notifications Setup (Optional)
+
+To receive mobile notifications in realtime mode, create a root `.env` file:
+
+```env
+TELEGRAM_BOT_TOKEN=YOUR_TOKEN
+TELEGRAM_CHAT_ID=YOUR_CHAT_ID
+```
+
+Install Telegram-related dependencies (already included in `requirements.txt`):
+
+```bash
+pip install requests python-dotenv
+```
+
+Notifications are sent only for threshold alerts:
+- `HIGH ANOMALY RATE DETECTED`
+- `TRAFFIC SPIKE DETECTED`
 
 ### 5. Prepare Training Data
 

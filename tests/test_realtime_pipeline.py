@@ -78,8 +78,11 @@ class TestRealtimePipeline(unittest.TestCase):
         self.assertEqual(len(df), 1)
         mock_report.assert_called_once()
 
+    @patch("pipeline.realtime_pipeline.send_telegram_alert")
     @patch("pipeline.realtime_pipeline.logger.warning")
-    def test_anomaly_alert_threshold_and_cooldown_reset(self, mock_warning):
+    def test_anomaly_alert_threshold_and_cooldown_reset(
+        self, mock_warning, mock_notify
+    ):
         alert_filter = AlertFilter(anomaly_threshold=5, anomaly_window_seconds=10)
         base_ts = 1000.0
 
@@ -88,17 +91,23 @@ class TestRealtimePipeline(unittest.TestCase):
 
         alert_filter.evaluate_and_alert()
         mock_warning.assert_any_call("🚨 HIGH ANOMALY RATE DETECTED")
+        mock_notify.assert_any_call("🚨 High anomaly rate detected")
         self.assertEqual(len(alert_filter.anomaly_timestamps), 0)
 
         mock_warning.reset_mock()
+        mock_notify.reset_mock()
         for offset in range(5):
             alert_filter.register_packet(is_anomaly=True, now_ts=base_ts + 20 + offset)
 
         alert_filter.evaluate_and_alert()
         mock_warning.assert_not_called()
+        mock_notify.assert_not_called()
 
+    @patch("pipeline.realtime_pipeline.send_telegram_alert")
     @patch("pipeline.realtime_pipeline.logger.warning")
-    def test_traffic_alert_threshold_and_cooldown_reset(self, mock_warning):
+    def test_traffic_alert_threshold_and_cooldown_reset(
+        self, mock_warning, mock_notify
+    ):
         alert_filter = AlertFilter(traffic_threshold=200, traffic_window_seconds=1)
         base_ts = 2000.0
 
@@ -107,14 +116,17 @@ class TestRealtimePipeline(unittest.TestCase):
 
         alert_filter.evaluate_and_alert()
         mock_warning.assert_any_call("🚨 TRAFFIC SPIKE DETECTED")
+        mock_notify.assert_any_call("⚠️ Traffic spike detected")
         self.assertEqual(len(alert_filter.packet_timestamps), 0)
 
         mock_warning.reset_mock()
+        mock_notify.reset_mock()
         for _ in range(200):
             alert_filter.register_packet(is_anomaly=False, now_ts=base_ts + 2.0)
 
         alert_filter.evaluate_and_alert()
         mock_warning.assert_not_called()
+        mock_notify.assert_not_called()
 
 
 if __name__ == "__main__":
